@@ -1,0 +1,12 @@
+# Personal backup — never push
+backup/
+
+# macOS
+.DS_Store
+
+# Generated PDF / HTML (binary / personal output)
+*.pdf
+*.html
+
+# Profile photo
+src/photo.jpg
