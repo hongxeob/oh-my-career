@@ -1,4 +1,5 @@
 # oh-my-career 🚀
+![dashboard-verification.png](dashboard-verification.png)
 
 JD를 분석해 맞춤 이력서를 **5단계 파이프라인**으로 자동 생성하는 Claude Code 기반 이력서 작성 자동화 시스템.
 
@@ -180,7 +181,10 @@ outcome/5_pdf/peachpay-final.pdf
 
 ## 📊 파이프라인 대시보드
 
-여러 회사에 동시에 지원하거나, 파이프라인을 며칠에 걸쳐 진행하다 보면 **결과물 파일을 하나씩 열어가며 현황을 파악하는 것이 번거로워집니다.** `/dashboard`를 실행하면 `outcome/` 전체를 자동 스캔해 브라우저에서 바로 확인할 수 있는 `dashboard.html`을 생성합니다.
+여러 회사에 동시에 지원하거나, 파이프라인을 며칠에 걸쳐 진행하다 보면 **결과물 파일을 하나씩 열어가며 현황을 파악하는 것이 번거로워집니다.** <br>
+`/dashboard`를 실행하면 `outcome/` 전체를 자동 스캔해 브라우저에서 바로 확인할 수 있는 `dashboard.html`을 생성합니다.
+
+![dashboard-verification.png](dashboard-verification.png)
 
 ```bash
 /dashboard
