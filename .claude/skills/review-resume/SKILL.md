@@ -12,7 +12,7 @@ description: Use when resume drafts have been verified and need deep quality rev
 
 ## Input
 
-**기본 경로** (career-management-ai 프로젝트):
+**기본 경로** (oh-my-career 프로젝트):
 - 검증 리포트: `outcome/2_verify/{company}-verify.md`
 - 초안: `outcome/1_draft/{company}-draft-{추천버전}.md`
 - 출력: `outcome/3_review/{company}-review.md`
