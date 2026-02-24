@@ -12,7 +12,7 @@ description: Use when resume drafts have been created and need fact-checking aga
 
 ## Input
 
-**기본 경로** (career-management-ai 프로젝트):
+**기본 경로** (oh-my-career 프로젝트):
 - 원본 이력서: `src/my-resume.md`
 - JD: `src/{company}-jd.md`
 - 검증 대상: `outcome/1_draft/{company}-draft-*.md`

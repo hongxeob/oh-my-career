@@ -12,7 +12,7 @@ description: Use when resume drafts have been reviewed and need final refinement
 
 ## Input
 
-**기본 경로** (career-management-ai 프로젝트):
+**기본 경로** (oh-my-career 프로젝트):
 - 초안: `outcome/1_draft/{company}-draft-{추천버전}.md`
 - 검증: `outcome/2_verify/{company}-verify.md`
 - 리뷰: `outcome/3_review/{company}-review.md`
