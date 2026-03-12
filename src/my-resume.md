@@ -173,6 +173,7 @@ B2B 물류/운송 솔루션에서 **배차 최적화 및 재고 관리 시스템
 
 #### 🔧 기타 주요 기여
 - **Go → Kotlin 마이그레이션**: 마이그레이션 대상을 패키지 단위로 분할하고 패키지별 CLAUDE.md·SKILL.md 가이드를 작성해 AI 분할 정복 방식으로 전환 속도 단축; Claude Code(설계·리뷰) · Codex(구현) · Gemini CLI(리서치) 역할 분담 방법론을 팀 전체에 교육·전파
+- **검색 스펙 문서 자동화 파이프라인 구축**: QA·기획팀의 반복적 검색 조건 문의로 인한 업무 병목 해소를 위해 Claude Code Hook(QueryBuilder 변경 감지) → `/update-search-spec` 스킬(스펙 MD 자동 재생성) → GitHub Actions(develop merge 시 Confluence 자동 동기화) 3단계 파이프라인 설계·구현; 코드 변경이 문서까지 자동 전파되는 구조로 팀 간 커뮤니케이션 비용 절감
 - **OpenTelemetry 분산 트레이싱 구축**: Jaeger 기반 분산 추적; PostgreSQL(JDBC), Kafka, Apache HttpClient5 수동 계측으로 CDC → 인덱싱 → 검색 전 구간 가시성 확보
 
 ---
