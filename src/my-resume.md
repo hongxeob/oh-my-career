@@ -145,7 +145,7 @@ B2B 물류/운송 솔루션에서 **배차 최적화 및 재고 관리 시스템
 
 ##### 4️⃣ 전시팀 레거시 검색 인프라 완전 재구축 — 단독 주도, 응답 시간 97% 단축
 
-**기술 스택**: `Kotlin` `Spring Boot` `OpenSearch` `CDC`
+**기술 스택**: `Kotlin` `Spring Boot` `OpenSearch` `Debezium` `Kafka` `Redis`
 
 **Situation (상황)**
 - 전시팀 검색 서버가 Go + Python + Elasticsearch 레거시 구조로 파편화 운영 중
@@ -156,20 +156,23 @@ B2B 물류/운송 솔루션에서 **배차 최적화 및 재고 관리 시스템
 - 전시/큐레이션 검색 기능 고도화
 
 **Action (행동)**
-- **6개 이상 엔티티 인덱스 전면 설계 및 마이그레이션**: 상품·셀러·카테고리·기획전(DisplayGroup)·앰배서더·스타일룩
-- **CDC 기반 실시간 데이터 동기화 파이프라인** 구축 (대용량 엔티티 10-partition 전략 포함)
+- **6개 이상 엔티티 인덱스 전면 설계 및 마이그레이션**: 상품·셀러·카테고리·기획전(DisplayGroup)·앰배서더·스타일룩; 다국어(한·일·영) 형태소 분석기 + N-gram fallback + 도메인별 boost 전략 적용
+- **Debezium + Kafka 기반 CDC 파이프라인**: 31개 토픽으로 전 엔티티 실시간 동기화; Redis List 기반 이벤트 버퍼링(5초 flush / 100개 임계치)으로 중복 제거 및 배치 처리
+- **Chain of Responsibility 패턴으로 문서 조립**: Product → Seller → Variant → Category → DisplayGroup → Stock 등 13단계 체인, 코루틴(suspend) 기반 병렬 처리
+- **Read/Write 인덱스 분리**: 쓰기(v2) → 읽기(stable) 원자적 전환으로 zero-downtime 재인덱싱 보장
 - 와일드카드 → 형태소 분석 기반 검색 전환 + 타입별 분리 조회로 쿼리 구조 근본 개선
 - 검색 품질 다수 개선: 셀러명 정확도 향상, 일본어 후리가나(読み) 검색 지원, 재고 우선 노출, 단어 경계 오검색 수정
 
 **Result (결과)**
 - ✅ **응답 시간: 최대 7초 → 20~30ms (97% 단축)**
 - ✅ Go + Python + ES 레거시 완전 제거, Kotlin + OpenSearch 단일 스택 통일
-- ✅ 다수 검색 품질 이슈 해소, 일본 사용자 검색 경험 개선
+- ✅ CDC 31개 토픽으로 6개+ 엔티티 실시간 동기화 안정화, 다수 검색 품질 이슈 해소
 
 ---
 
 #### 🔧 기타 주요 기여
 - **Go → Kotlin 마이그레이션**: 마이그레이션 대상을 패키지 단위로 분할하고 패키지별 CLAUDE.md·SKILL.md 가이드를 작성해 AI 분할 정복 방식으로 전환 속도 단축; Claude Code(설계·리뷰) · Codex(구현) · Gemini CLI(리서치) 역할 분담 방법론을 팀 전체에 교육·전파
+- **OpenTelemetry 분산 트레이싱 구축**: Jaeger 기반 분산 추적; PostgreSQL(JDBC), Kafka, Apache HttpClient5 수동 계측으로 CDC → 인덱싱 → 검색 전 구간 가시성 확보
 
 ---
 
