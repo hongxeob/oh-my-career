@@ -109,15 +109,16 @@ B2B 물류/운송 솔루션에서 **배차 최적화 및 재고 관리 시스템
 - 신규 개발자의 빠른 온보딩 환경 구성
 
 **Action (행동)**
-- **Ports & Adapters 패턴** 기반의 확장 가능한 프로젝트 구조 설계 (domain/infra 완전 분리)
-- **도메인-인프라 계층 분리**로 의존성 최소화 및 유지보수성 향상
-- **공통 모듈화 및 개발 컨벤션** 수립으로 향후 개발 생산성 기반 마련
-- **상세한 기술 문서 및 온보딩 가이드** 작성
+- **Ports & Adapters 패턴 기반 domain/infra 완전 분리**: domain/repository·client에 Port 인터페이스 정의, infra/jpa·kafka·web에 Adapter 구현 — 도메인이 인프라에 의존하지 않는 의존성 역전 구조 확립
+- **CQRS 패턴 적용**: CommandService(readOnly=false) · QueryService(readOnly=true) 분리 + DB Read/Write 라우팅으로 쓰기/읽기 관심사 분리
+- **nova-library 공통 모듈 설계**: BaseEntity, SoftDeletableEntity, BizException, KafkaJsonProducerService 등 팀 공통 추상화 구현; Kafka Dead Letter Topic(DLT) 기반 장애 격리 메커니즘 포함
+- **Custom Gradle 코드 생성 플러그인 (nova-codegen)**: SQL 스키마 기반 CRUD 컨트롤러·서비스·테스트 보일러플레이트 자동 생성으로 신규 도메인 추가 비용 절감
+- **개발 품질 체계 구축**: ktlint + JaCoCo(최소 60% 커버리지 강제) 적용; 레이어별 네이밍 컨벤션·API 경로 규약·브랜치 전략 등 30KB 분량의 온보딩 가이드 작성
 
 **Result (결과)**
-- ✅ **확장 가능한 아키텍처 설계로 향후 팀 확장 시 빠른 개발 속도 확보**
-- ✅ **신규 입사자도 문서 기반 빠른 프로젝트 이해 및 합류 지원**
-- ✅ **개발 컨벤션 통일로 코드 품질 및 일관성 보장**
+- ✅ **팀 전체가 일관된 아키텍처 패턴으로 신규 도메인 빠르게 추가 가능**
+- ✅ **nova-codegen으로 CRUD 보일러플레이트 자동 생성, 반복 작업 제거**
+- ✅ **신규 입사자도 문서 기반 빠른 온보딩, 코드 품질 최소 기준 강제로 일관성 확보**
 
 ---
 
