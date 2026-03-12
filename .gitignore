@@ -11,3 +11,7 @@ backup/
 # Profile photo
 src/photo.jpg
 /.idea
+
+# oh-my-claudecode tool directories
+.omc/
+.omx/
