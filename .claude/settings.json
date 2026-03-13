@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport sys, json, shutil\ntry:\n    d = json.load(sys.stdin)\n    fp = d.get('tool_input', {}).get('file_path', '')\n    if fp.endswith('src/my-resume.md'):\n        shutil.copy(fp, '/Users/mediquitous/Desktop/obsidian/resume/원본 이력서.md')\n        print('\\033[32m[SYNC] src/my-resume.md → Obsidian 원본 이력서.md 동기화 완료\\033[0m')\nexcept Exception as e:\n    print(f'[SYNC ERROR] {e}')\n\""
+          }
+        ]
+      }
+    ]
+  }
+}
