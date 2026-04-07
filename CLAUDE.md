@@ -1,6 +1,6 @@
 # oh-my-career
 
-JD를 분석해 맞춤 이력서를 5단계 파이프라인으로 생성하는 Claude Code 기반 이력서 작성 자동화 프로젝트.
+JD를 분석해 맞춤 이력서를 생성하고, 면접까지 준비하는 Claude Code 기반 구직 자동화 프로젝트.
 
 ## 디렉토리 구조
 
@@ -11,22 +11,27 @@ oh-my-career/
 │   └── {company}-jd.md       # 지원 회사 JD
 ├── instruction/              # 워크플로우 추가 지침
 └── outcome/
+    ├── 0_evaluate/           # JD 적합도 평가 리포트
     ├── 1_draft/              # 초안 3가지 (A/B/C 버전)
     ├── 2_verify/             # 팩트 검증 + JD 정합성 리포트
     ├── 3_review/             # 품질 리뷰 리포트
     ├── 4_refine/             # 마크다운 최종본
-    └── 5_pdf/                # HTML + PDF 제출본
+    ├── 5_pdf/                # HTML + PDF 제출본
+    └── interview/            # STAR 스토리 뱅크 + 회사별 면접 준비
 ```
 
 ## 파일 명명 규칙
 
 ```
+outcome/0_evaluate/{company}-evaluate.md
 outcome/1_draft/{company}-draft-{A|B|C}.md
 outcome/2_verify/{company}-verify.md
 outcome/3_review/{company}-review.md
 outcome/4_refine/{company}-final.md
 outcome/5_pdf/{company}-final.html
 outcome/5_pdf/{company}-final.pdf
+outcome/interview/story-bank.md
+outcome/interview/{company}-interview.md
 ```
 
 예: 카카오스타일 → `kakao-style-draft-A.md`, `kakao-style-verify.md` ...
@@ -35,11 +40,13 @@ outcome/5_pdf/{company}-final.pdf
 
 | 순서 | 슬래시 커맨드 | 역할 |
 |------|-------------|------|
+| 0 | `/evaluate-jd` | JD vs 이력서 적합도 A-F 등급 평가 (사전 필터) |
 | 1 | `/draft-resume` | JD 분석 → 전략 다른 초안 3가지 생성 |
 | 2 | `/verify-resume` | 원본 대비 팩트 검증 + JD 정합성 체크 |
 | 3 | `/review-resume` | 채용자 시각 품질 리뷰 (STAR 밀도, 표현) |
 | 4 | `/refine-resume` | 모든 피드백 통합 → 마크다운 최종본 |
 | 5 | `/pdf-resume` | MD 최종본 → HTML + PDF 변환 |
+| - | `/story-bank` | STAR+R 스토리 뱅크 생성 + 회사별 면접 준비 |
 
 ## 핵심 규칙
 
