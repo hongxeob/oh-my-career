@@ -104,6 +104,8 @@ h2 {
 
 ul { padding-left: 1.2em; margin: 2px 0; }
 li { margin-bottom: 2px; }
+li > ul { margin: 2px 0 2px 0; }
+li > ul > li { font-size: 9pt; color: #333; margin-bottom: 1px; }
 
 table {
   width: 100%;
@@ -115,6 +117,23 @@ th { background: #f5f5f5; font-weight: 600; }
 ```
 
 **섹션 구조**: 각 섹션을 `<section>` 태그로 감싼다. 페이지 분리가 필요한 섹션에는 `style="break-before: page;"` 추가.
+
+**서브 불렛 가이드라인** — 가독성을 위해 긴 bullet은 중첩 `<ul>`로 분리한다:
+
+- **서브 불렛을 써야 하는 경우**: 하나의 bullet에 세미콜론(`;`) 또는 독립적인 기술 결정이 2개 이상 나열될 때
+- **패턴**: 헤더 `<li>`에는 임팩트·수치만, 기술 세부·원인·해결은 서브 `<li>`로
+
+```html
+<li>
+  <strong>[태그] 임팩트 설명</strong> → 결과 수치
+  <ul>
+    <li>원인 또는 기술 결정 1</li>
+    <li>원인 또는 기술 결정 2</li>
+  </ul>
+</li>
+```
+
+- **서브 불렛이 불필요한 경우**: 단일 흐름(문제→해결→결과)이 자연스럽게 이어지는 짧은 bullet
 
 ### Step 3: HTML 저장
 
