@@ -1,7 +1,7 @@
 # oh-my-career 🚀
 ![dashboard-verification.png](dashboard-verification.png)
 
-JD를 분석해 맞춤 이력서를 **5단계 파이프라인**으로 자동 생성하는 Claude Code 기반 이력서 작성 자동화 시스템.
+JD를 분석해 맞춤 이력서를 자동 생성하고, 면접까지 준비하는 Claude Code 기반 구직 자동화 시스템.
 
 > 📦 **예시 파일 포함**: `src/my-resume.md` (가상 인물), `src/example-jd.md`, `outcome/` 예시 출력물로 파이프라인 전체 흐름을 즉시 확인할 수 있습니다.
 
@@ -23,6 +23,9 @@ JD를 분석해 맞춤 이력서를 **5단계 파이프라인**으로 자동 생
 src/my-resume.md  +  src/{company}-jd.md
           │
           ▼
+  /evaluate-jd    →  outcome/0_evaluate/{company}-evaluate.md   (사전 필터)
+          │
+          ▼
    /draft-resume  →  outcome/1_draft/{company}-draft-{A|B|C}.md
           │
           ▼
@@ -36,6 +39,9 @@ src/my-resume.md  +  src/{company}-jd.md
           │
           ▼
     /pdf-resume   →  outcome/5_pdf/{company}-final.html + .pdf
+
+  /story-bank     →  outcome/interview/story-bank.md            (면접 준비)
+                      outcome/interview/{company}-interview.md
 ```
 
 ---
@@ -65,12 +71,18 @@ https://r.jina.ai/careers.kakao.com/jobs/12345
 # Claude Code 실행
 claude
 
+# (선택) JD 적합도 사전 평가 — B 이상이면 지원 추천
+/evaluate-jd
+
 # 슬래시 커맨드 순서대로 실행
 /draft-resume
 /verify-resume
 /review-resume
 /refine-resume
 /pdf-resume
+
+# (선택) 면접 준비 — STAR 스토리 뱅크 생성
+/story-bank
 ```
 
 각 커맨드를 실행하면 Claude가 자동으로 파일을 읽고 결과물을 `outcome/` 하위 폴더에 저장합니다.
@@ -89,18 +101,22 @@ oh-my-career/
 ├── instruction/              # 워크플로우 추가 지침 (선택)
 ├── .claude/
 │   └── skills/               # 파이프라인 스킬 정의
+│       ├── evaluate-jd/
 │       ├── draft-resume/
 │       ├── verify-resume/
 │       ├── review-resume/
 │       ├── refine-resume/
 │       ├── pdf-resume/
+│       ├── story-bank/
 │       └── dashboard/
 └── outcome/
+    ├── 0_evaluate/           # JD 적합도 평가 리포트
     ├── 1_draft/              # 초안 3가지 (A/B/C 버전)
     ├── 2_verify/             # 팩트 검증 + JD 정합성 리포트
     ├── 3_review/             # 품질 리뷰 리포트
     ├── 4_refine/             # 마크다운 최종본
-    └── 5_pdf/                # HTML + PDF 제출본
+    ├── 5_pdf/                # HTML + PDF 제출본
+    └── interview/            # STAR 스토리 뱅크 + 회사별 면접 준비
 ```
 
 ---
@@ -108,12 +124,15 @@ oh-my-career/
 ## 📝 파일 명명 규칙
 
 ```
+outcome/0_evaluate/{company}-evaluate.md
 outcome/1_draft/{company}-draft-{A|B|C}.md
 outcome/2_verify/{company}-verify.md
 outcome/3_review/{company}-review.md
 outcome/4_refine/{company}-final.md
 outcome/5_pdf/{company}-final.html
 outcome/5_pdf/{company}-final.pdf
+outcome/interview/story-bank.md
+outcome/interview/{company}-interview.md
 ```
 
 **예시** (피치페이 지원 시):
@@ -132,6 +151,22 @@ outcome/5_pdf/peachpay-final.pdf
 ---
 
 ## 🔍 각 단계 설명
+
+### 0. `/evaluate-jd` — JD 적합도 사전 평가 (선택)
+
+JD와 원본 이력서를 대조해 **10차원 가중 스코어링**으로 A-F 등급을 산출합니다.
+
+| 등급 | 판정 |
+|------|------|
+| **A** (4.5-5.0) | 강력 추천 — 거의 완벽한 매칭 |
+| **B** (3.5-4.4) | 추천 — 강점이 갭을 충분히 커버 |
+| **C** (2.5-3.4) | 검토 필요 — 매칭되지만 갭 존재 |
+| **D-F** | 비추천 — 시간 낭비 방지 |
+
+- 강점 매칭, 갭 분석, 이력서 커스터마이징 가이드, 예상 면접 질문 Top 5 포함
+- **B 이상이면 `/draft-resume`로 진행**, C 이하면 갭 분석 참고해 지원 여부 재검토
+
+> 👀 **검토 포인트**: 등급이 낮아도 성장 가능성이나 도메인 흥미가 있다면 지원할 수 있습니다. 점수는 참고용이지 절대 기준이 아닙니다.
 
 ### 1. `/draft-resume` — 전략별 초안 3가지 생성
 
@@ -176,6 +211,16 @@ outcome/5_pdf/peachpay-final.pdf
 - 콘텐츠 수정 없이 레이아웃·인쇄 CSS만 처리
 
 > 👀 **검토 포인트**: 생성된 PDF를 열어 페이지 잘림, 폰트, 여백, 사진 위치를 눈으로 확인하세요. 필요 시 HTML 파일을 직접 수정한 뒤 PDF를 재생성하면 됩니다.
+
+### 6. `/story-bank` — 면접 STAR 스토리 뱅크 (선택)
+
+이력서의 경험들을 **STAR+R(Reflection) 구조**로 변환해 면접용 마스터 스토리를 축적합니다.
+
+- **범용 모드** (`/story-bank`): 이력서 전체에서 5-10개 마스터 스토리 추출, 태그 분류 (#성능최적화 #장애대응 #아키텍처 #리더십 등)
+- **회사별 모드** (`/story-bank {company}`): JD 기반 예상 질문 생성 + 마스터 스토리 매칭 + 역질문 추천
+- 스토리 뱅크는 **누적 업데이트** — 이력서에 새 경험이 추가되면 자동으로 신규 스토리 append
+
+> 👀 **검토 포인트**: AI가 생성한 Reflection이 본인의 실제 배움과 다르다면 직접 수정하세요. 면접에서 자연스럽게 말할 수 있는 표현이어야 합니다.
 
 ---
 
