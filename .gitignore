@@ -18,3 +18,7 @@ src/photo.jpg
 
 # Personal real resume — never track
 src/my-resume.md
+
+# Company JDs — never track (keep example)
+src/*-jd.md
+!src/example-jd.md
