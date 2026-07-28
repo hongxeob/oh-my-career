@@ -17,6 +17,7 @@ oh-my-career/
     ├── 3_review/             # 품질 리뷰 리포트
     ├── 4_refine/             # 마크다운 최종본
     ├── 5_pdf/                # HTML + PDF 제출본
+    ├── 6_portfolio/          # 딥다이브 포트폴리오 (선택 — 첨부 요구 시)
     └── interview/            # STAR 스토리 뱅크 + 회사별 면접 준비
 ```
 
@@ -30,6 +31,8 @@ outcome/3_review/{company}-review.md
 outcome/4_refine/{company}-final.md
 outcome/5_pdf/{company}-final.html
 outcome/5_pdf/{company}-final.pdf
+outcome/6_portfolio/{company}-portfolio.html
+outcome/6_portfolio/{company}-portfolio.pdf
 outcome/interview/story-bank.md
 outcome/interview/{company}-interview.md
 ```
@@ -45,7 +48,9 @@ outcome/interview/{company}-interview.md
 | 2 | `/verify-resume` | 원본 대비 팩트 검증 + JD 정합성 체크 |
 | 3 | `/review-resume` | 채용자 시각 품질 리뷰 (STAR 밀도, 표현) |
 | 4 | `/refine-resume` | 모든 피드백 통합 → 마크다운 최종본 |
+| 4.5 | `/final-check` | 채용자 시각 최종 검증 (JD 매칭·ATS·서류 통과 게이트) |
 | 5 | `/pdf-resume` | MD 최종본 → HTML + PDF 변환 |
+| 6 | `/portfolio` | 딥다이브 포트폴리오 생성 (선택 — 포트폴리오 첨부 요구 시) |
 | - | `/story-bank` | STAR+R 스토리 뱅크 생성 + 회사별 면접 준비 |
 
 ## 핵심 규칙
