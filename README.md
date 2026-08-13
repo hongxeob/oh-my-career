@@ -38,8 +38,12 @@ src/my-resume.md  +  src/{company}-jd.md
   /refine-resume  →  outcome/4_refine/{company}-final.md
           │
           ▼
+  /final-check    →  outcome/4_refine/{company}-final-check.md   (채용자 시각 최종 게이트)
+          │
+          ▼
     /pdf-resume   →  outcome/5_pdf/{company}-final.html + .pdf
 
+  /humanize       →  산문(커버레터·포트폴리오·Summary) AI 티 제거 윤문   (선택)
   /story-bank     →  outcome/interview/story-bank.md            (면접 준비)
                       outcome/interview/{company}-interview.md
 ```
@@ -106,6 +110,7 @@ oh-my-career/
 │       ├── verify-resume/
 │       ├── review-resume/
 │       ├── refine-resume/
+│       ├── final-check/
 │       ├── pdf-resume/
 │       ├── story-bank/
 │       └── dashboard/
@@ -129,6 +134,7 @@ outcome/1_draft/{company}-draft-{A|B|C}.md
 outcome/2_verify/{company}-verify.md
 outcome/3_review/{company}-review.md
 outcome/4_refine/{company}-final.md
+outcome/4_refine/{company}-final-check.md
 outcome/5_pdf/{company}-final.html
 outcome/5_pdf/{company}-final.pdf
 outcome/interview/story-bank.md
@@ -202,6 +208,20 @@ JD와 원본 이력서를 대조해 **10차원 가중 스코어링**으로 A-F �
 - 콘텐츠 완성 단계 — 레이아웃 변환은 5단계에서 처리
 
 > 👀 **검토 포인트**: 최종본을 처음부터 끝까지 직접 읽어보세요. 이전 단계에서 놓친 어색한 부분, 불필요한 내용, 삭제할 항목이 있다면 이 단계에서 직접 편집하는 것이 좋습니다.
+
+### 4.5 `/final-check` — 채용자 시각 최종 게이트
+
+15년차 시니어 채용담당자 시각으로 최종본을 JD와 대조해 **서류 통과 가능성을 냉정하게 판정**합니다. (read-only — 직접 수정하지 않고 지적·개선안만 제시)
+
+- JD 필수·우대 요건별 **충분/약함/없음** 매칭표
+- ATS 키워드, 정량화, 6초 스캔, 커리어 서사 일관성 점검
+- 산문 구간 **AI 티(번역투·정형 문형·가운뎃점 과용 등)** 탐지 → `/humanize`로 핸드오프
+
+> 👀 **검토 포인트**: 판정이 '낮음'이면 수정 리스트를 반영한 뒤 재검토하세요. '높음/보통'이면 다음 단계로 진행합니다.
+
+### `/humanize` — 산문 AI 티 제거 윤문 (선택)
+
+커버레터·포트폴리오·Summary 등 **산문 산출물**에서 AI가 쓴 듯한 티(번역투, 과잉 접속, 정형 문형)를 걷어냅니다. **개조식 이력서 bullet에는 적용하지 않습니다.**
 
 ### 5. `/pdf-resume` — HTML + PDF 변환
 
