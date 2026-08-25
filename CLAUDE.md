@@ -51,7 +51,6 @@ outcome/interview/{company}-interview.md
 | 4.5 | `/final-check` | 채용자 시각 최종 검증 (JD 매칭·ATS·서류 통과 게이트) |
 | 5 | `/pdf-resume` | MD 최종본 → HTML + PDF 변환 |
 | 6 | `/portfolio` | 딥다이브 포트폴리오 생성 (선택 — 포트폴리오 첨부 요구 시) |
-| - | `/humanize` | 산문 AI 티 제거 윤문 (선택 — 커버레터·포트폴리오·Summary 등 **산문** 산출물에만. 개조식 이력서 bullet엔 미적용) |
 | - | `/story-bank` | STAR+R 스토리 뱅크 생성 + 회사별 면접 준비 |
 
 ## 핵심 규칙
