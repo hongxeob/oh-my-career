@@ -43,7 +43,6 @@ src/my-resume.md  +  src/{company}-jd.md
           ▼
     /pdf-resume   →  outcome/5_pdf/{company}-final.html + .pdf
 
-  /humanize       →  산문(커버레터·포트폴리오·Summary) AI 티 제거 윤문   (선택)
   /story-bank     →  outcome/interview/story-bank.md            (면접 준비)
                       outcome/interview/{company}-interview.md
 ```
@@ -215,13 +214,9 @@ JD와 원본 이력서를 대조해 **10차원 가중 스코어링**으로 A-F �
 
 - JD 필수·우대 요건별 **충분/약함/없음** 매칭표
 - ATS 키워드, 정량화, 6초 스캔, 커리어 서사 일관성 점검
-- 산문 구간 **AI 티(번역투·정형 문형·가운뎃점 과용 등)** 탐지 → `/humanize`로 핸드오프
+- 산문 구간 **AI 티(번역투·정형 문형·가운뎃점 과용 등)** 탐지 시 고친 문장까지 함께 제시 — 확인 후 최종본에 바로 반영
 
 > 👀 **검토 포인트**: 판정이 '낮음'이면 수정 리스트를 반영한 뒤 재검토하세요. '높음/보통'이면 다음 단계로 진행합니다.
-
-### `/humanize` — 산문 AI 티 제거 윤문 (선택)
-
-커버레터·포트폴리오·Summary 등 **산문 산출물**에서 AI가 쓴 듯한 티(번역투, 과잉 접속, 정형 문형)를 걷어냅니다. **개조식 이력서 bullet에는 적용하지 않습니다.**
 
 ### 5. `/pdf-resume` — HTML + PDF 변환
 
