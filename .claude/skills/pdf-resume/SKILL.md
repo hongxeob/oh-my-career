@@ -37,6 +37,13 @@ Read: outcome/{company}/4_refine/{company}-final.md
 - 폴더명/파일명에서 `{company}` 자동 파싱 (예: `outcome/kakao-style/4_refine/kakao-style-final.md` → `kakao-style`)
 - `src/photo.jpg` 존재 여부 확인
 
+**⚠️ 최종본에서 이력서 본문만 추출한다.** `refine-resume`의 출력은 리포트 래퍼 형식이므로 아래는 **HTML에 넣지 않는다**:
+- 상단 메타(`# {company} 지원 이력서 — 최종본`, `생성일`, `기반`, `적용 피드백`)
+- 하단 `## 변경 이력` 표
+- `**전략적 의도**` 문단
+
+첫 `---` 구분선 다음부터 `## 변경 이력` 직전까지가 이력서 본문이다.
+
 ### Step 2: HTML 변환 (템플릿 치환)
 
 **CSS를 직접 작성하지 않는다.** 같은 디렉토리의 `template.html`을 읽어 placeholder만 치환한다.
@@ -102,7 +109,7 @@ HTML 저장 완료 후 Chrome headless 명령을 실행한다:
   --headless --disable-gpu \
   --print-to-pdf="outcome/{company}/5_pdf/{company}-final.pdf" \
   --no-pdf-header-footer \
-  "file:///$(pwd)/outcome/{company}/5_pdf/{company}-final.html"
+  "file://$(pwd)/outcome/{company}/5_pdf/{company}-final.html"
 ```
 
 - Bash 실행이 가능한 경우 직접 실행하여 PDF 생성 완료 확인
@@ -131,7 +138,7 @@ PDF 생성 확인 후, `src/pending/{company}_jd.md`(또는 `{company}-jd.md`)�
 
 ## Critical Rules
 
-- **콘텐츠 수정 금지** — 마크다운의 텍스트를 한 글자도 바꾸지 않는다
+- **콘텐츠 수정 금지** — 마크다운 문장의 **표현·수치·사실을 바꾸지 않는다**. 허용되는 것은 마크업 변환뿐이다: 마크다운 → HTML 태그, 그리고 서브 불렛 분리(문장을 절 경계에서 나눠 중첩 `<ul>`로 옮기는 것 — 단어를 고쳐 쓰는 것이 아니다)
 - **4_refine 파일 없으면 즉시 중단** — 이전 단계 건너뛰기 방지
 - **CSS 재작성 금지** — `template.html`을 읽어 placeholder만 치환한다. 스타일을 바꿔야 하면 템플릿 파일 자체를 고쳐 모든 회사에 반영되게 한다
 - **사진은 있을 때만** — `src/photo.jpg` 없으면 사진 영역 자체를 생략
@@ -141,8 +148,9 @@ PDF 생성 확인 후, `src/pending/{company}_jd.md`(또는 `{company}-jd.md`)�
 
 ```
 ✅ HTML 저장 완료 → outcome/{company}/5_pdf/{company}-final.html
-✅ PDF 생성 완료 → outcome/{company}/5_pdf/{company}-final.pdf
-✅ JD 이동 완료 → src/pending/{company}_jd.md → src/applied/{company}_jd.md
+✅ PDF 생성 완료 → outcome/{company}/5_pdf/{company}-final.pdf ({N}페이지)
+{JD를 옮겼으면}  ✅ JD 이동 완료 → src/pending/{company}_jd.md → src/applied/{company}_jd.md
+{옮길 게 없었으면} ⏭️ JD 이동 생략 — src/pending/에 해당 JD 없음
 
 이력서 파이프라인 완료:
   src/my-resume.md + src/applied/{company}_jd.md

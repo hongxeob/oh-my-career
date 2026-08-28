@@ -134,7 +134,8 @@ th { background: #f5f5f5; font-weight: 600; text-align: left; }
        소제목(h4)이 없는 회사는 h4 없이 <ul>만 둔다. -->
   <div class="company-block">
     <div class="company-header">
-      <span>{{COMPANY_NAME}} | {{TEAM_ROLE}}</span>
+      <!-- 왼쪽 span에 회사·팀·직책을 " | "와 " · "로 묶는다: 회사 | 팀 · 직책 -->
+      <span>{{COMPANY_NAME}} | {{TEAM}} · {{ROLE}}</span>
       <span>{{PERIOD}}</span>
     </div>
     <p class="company-intro">{{COMPANY_INTRO}}</p>
@@ -155,4 +156,15 @@ th { background: #f5f5f5; font-weight: 600; text-align: left; }
     <!-- {{STACK_ROWS}} — JD 필수 기술이 위로 오도록 정렬 -->
     <tr><td>{{CATEGORY}}</td><td>{{ITEMS}}</td></tr>
   </table>
+</section>
+
+<!-- {{EXTRA_SECTIONS}} — 최종본에 개인 프로젝트·교육·수상 등 추가 섹션이 있으면
+     아래 형태로 복제해 붙인다. 새 CSS 클래스를 만들지 말고 기존 것을 재사용한다.
+     최종본에 없는 섹션은 이 블록째 삭제한다. -->
+<section>
+  <h2>{{SECTION_TITLE}}</h2>
+  <ul>
+    <li><strong>{{ITEM_NAME}}</strong>: {{ITEM_DETAIL}}</li>
+  </ul>
+  <p class="stack"><code>{{TECH}}</code></p>
 </section>

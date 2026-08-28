@@ -26,6 +26,8 @@ Read: outcome/{company}/2_verify/{company}-verify.md    ← 추천 버전 확인
 Read: outcome/{company}/1_draft/{company}-draft-{추천버전}.md
 ```
 
+verify가 **하이브리드를 추천했으면** 베이스 버전과 이식 대상 버전을 모두 읽고, 리뷰는 "조립된 결과물" 기준으로 작성한다. 리포트 상단 `리뷰 대상`에 조립 구성을 명시할 것 (예: `B 베이스 + A의 AI 활용 섹션`).
+
 ### Step 2: Summary/헤드라인 리뷰
 
 채용자가 처음 8초에 읽는 부분:
