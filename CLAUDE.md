@@ -35,6 +35,7 @@ outcome/{company}/1_draft/{company}-draft-{A|B|C}.md
 outcome/{company}/2_verify/{company}-verify.md
 outcome/{company}/3_review/{company}-review.md
 outcome/{company}/4_refine/{company}-final.md
+outcome/{company}/4_refine/{company}-final-check.md
 outcome/{company}/5_pdf/{company}-final.html
 outcome/{company}/5_pdf/{company}-final.pdf
 outcome/{company}/6_portfolio/{company}-portfolio.html
@@ -58,6 +59,7 @@ outcome/interview/story-bank.md
 | 5 | `/pdf-resume` | MD 최종본 → HTML + PDF 변환 |
 | 6 | `/portfolio` | 딥다이브 포트폴리오 생성 (선택 — 포트폴리오 첨부 요구 시) |
 | - | `/story-bank` | STAR+R 스토리 뱅크 생성 + 회사별 면접 준비 |
+| - | `/dashboard` | 회사별 파이프라인 진행 현황 HTML 생성 (`/dashboard {company}`로 상세 열람) |
 
 ## 핵심 규칙
 
