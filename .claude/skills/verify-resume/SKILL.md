@@ -14,18 +14,18 @@ description: Use when resume drafts have been created and need fact-checking aga
 
 **기본 경로** (oh-my-career 프로젝트):
 - 원본 이력서: `src/my-resume.md`
-- JD: `src/{company}-jd.md`
-- 검증 대상: `outcome/1_draft/{company}-draft-*.md`
-- 출력: `outcome/2_verify/{company}-verify.md`
+- JD: `src/pending/{company}_jd.md` (또는 `src/applied/`)
+- 검증 대상: `outcome/{company}/1_draft/{company}-draft-*.md`
+- 출력: `outcome/{company}/2_verify/{company}-verify.md`
 
 ## Process
 
 ### Step 1: 파일 로드
 
 ```
-Read: src/my-resume.md          ← 팩트 기준
-Read: src/{company}-jd.md       ← JD 기준
-Read: outcome/1_draft/          ← 검증할 초안들
+Read: src/my-resume.md                        ← 팩트 기준
+Read: src/pending/{company}_jd.md              ← JD 기준
+Read: outcome/{company}/1_draft/               ← 검증할 초안들
 ```
 
 ### Step 2: 팩트 검증
@@ -67,12 +67,12 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 
 ### Step 5: 결과 저장
 
-`outcome/2_verify/{company}-verify.md`에 저장:
+`outcome/{company}/2_verify/{company}-verify.md`에 저장:
 
 ```markdown
 # {company} 이력서 검증 리포트
 생성일: {date}
-검증 대상: outcome/1_draft/{company}-draft-*.md
+검증 대상: outcome/{company}/1_draft/{company}-draft-*.md
 
 ## 팩트 검증 결과
 [Step 2 표]
@@ -103,6 +103,6 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 ## Next Step
 
 ```
-✅ 검증 리포트 저장 완료 → outcome/2_verify/
+✅ 검증 리포트 저장 완료 → outcome/{company}/2_verify/
 → 다음 단계: /review-resume 로 품질 리뷰 실행
 ```

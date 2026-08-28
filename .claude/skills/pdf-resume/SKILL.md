@@ -12,28 +12,28 @@ description: Use when a finalized resume markdown exists and needs to be convert
 
 ## Input
 
-- `outcome/4_refine/{company}-final.md` — refine-resume 단계 완성본
+- `outcome/{company}/4_refine/{company}-final.md` — refine-resume 단계 완성본
 - `src/photo.jpg` — 프로필 사진 (있을 때만 삽입, 없으면 생략)
 
 ## Output
 
-- `outcome/5_pdf/{company}-final.html`
-- `outcome/5_pdf/{company}-final.pdf`
+- `outcome/{company}/5_pdf/{company}-final.html`
+- `outcome/{company}/5_pdf/{company}-final.pdf`
 
 ## Process
 
 ### Step 1: 파일 로드 및 회사명 감지
 
 ```
-Read: outcome/4_refine/{company}-final.md
+Read: outcome/{company}/4_refine/{company}-final.md
 ```
 
 - 파일이 없으면 즉시 중단:
   ```
-  ❌ outcome/4_refine/{company}-final.md 파일이 없습니다.
+  ❌ outcome/{company}/4_refine/{company}-final.md 파일이 없습니다.
      먼저 /refine-resume를 실행해 최종본을 생성하세요.
   ```
-- 파일명에서 `{company}` 자동 파싱 (예: `kakao-style-final.md` → `kakao-style`)
+- 폴더명/파일명에서 `{company}` 자동 파싱 (예: `outcome/kakao-style/4_refine/kakao-style-final.md` → `kakao-style`)
 - `src/photo.jpg` 존재 여부 확인
 
 ### Step 2: HTML 변환
@@ -49,9 +49,10 @@ Read: outcome/4_refine/{company}-final.md
     <p class="contact">{이메일} | {전화} | {GitHub/링크}</p>
   </div>
   <!-- photo.jpg 존재 시만 포함 -->
-  <img class="photo" src="../../src/photo.jpg" alt="프로필 사진">
+  <img class="photo" src="../../../src/photo.jpg" alt="프로필 사진">
 </header>
 ```
+(출력 경로가 `outcome/{company}/5_pdf/`로 한 단계 더 깊어졌으므로 상대경로는 `../../../src/photo.jpg`)
 
 **인쇄 CSS 필수 포함**:
 ```css
@@ -138,8 +139,8 @@ th { background: #f5f5f5; font-weight: 600; }
 ### Step 3: HTML 저장
 
 ```
-outcome/5_pdf/ 디렉토리 생성 (없을 경우)
-outcome/5_pdf/{company}-final.html 저장
+outcome/{company}/5_pdf/ 디렉토리 생성 (없을 경우)
+outcome/{company}/5_pdf/{company}-final.html 저장
 ```
 
 Write 도구로 HTML 전문을 저장한다.
@@ -151,13 +152,18 @@ HTML 저장 완료 후 Chrome headless 명령을 실행한다:
 ```bash
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
   --headless --disable-gpu \
-  --print-to-pdf="outcome/5_pdf/{company}-final.pdf" \
+  --print-to-pdf="outcome/{company}/5_pdf/{company}-final.pdf" \
   --no-pdf-header-footer \
-  "file:///$(pwd)/outcome/5_pdf/{company}-final.html"
+  "file:///$(pwd)/outcome/{company}/5_pdf/{company}-final.html"
 ```
 
 - Bash 실행이 가능한 경우 직접 실행하여 PDF 생성 완료 확인
 - 실행 실패 시 위 명령어를 사용자에게 출력하고 수동 실행 안내
+
+### Step 5: JD 파일 pending → applied 이동
+
+PDF 생성 확인 후, `src/pending/{company}_jd.md`(또는 `{company}-jd.md`)가 존재하면 `src/applied/`로 이동한다(`mv`).
+`src/pending/`에 없으면(이미 applied에 있거나 다른 위치) 건너뛴다 — 실패로 취급하지 않는다.
 
 ## Critical Rules
 
@@ -169,14 +175,15 @@ HTML 저장 완료 후 Chrome headless 명령을 실행한다:
 ## Completion
 
 ```
-✅ HTML 저장 완료 → outcome/5_pdf/{company}-final.html
-✅ PDF 생성 완료 → outcome/5_pdf/{company}-final.pdf
+✅ HTML 저장 완료 → outcome/{company}/5_pdf/{company}-final.html
+✅ PDF 생성 완료 → outcome/{company}/5_pdf/{company}-final.pdf
+✅ JD 이동 완료 → src/pending/{company}_jd.md → src/applied/{company}_jd.md
 
 이력서 파이프라인 완료:
-  src/my-resume.md + src/{company}-jd.md
-  → outcome/1_draft/  (초안 3가지)
-  → outcome/2_verify/ (팩트/JD 검증)
-  → outcome/3_review/ (품질 리뷰)
-  → outcome/4_refine/ (마크다운 최종본)
-  → outcome/5_pdf/    (HTML + PDF 제출본)
+  src/my-resume.md + src/applied/{company}_jd.md
+  → outcome/{company}/1_draft/  (초안 3가지)
+  → outcome/{company}/2_verify/ (팩트/JD 검증)
+  → outcome/{company}/3_review/ (품질 리뷰)
+  → outcome/{company}/4_refine/ (마크다운 최종본)
+  → outcome/{company}/5_pdf/    (HTML + PDF 제출본)
 ```

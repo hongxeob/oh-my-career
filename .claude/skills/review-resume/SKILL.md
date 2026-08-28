@@ -13,17 +13,17 @@ description: Use when resume drafts have been verified and need deep quality rev
 ## Input
 
 **기본 경로** (oh-my-career 프로젝트):
-- 검증 리포트: `outcome/2_verify/{company}-verify.md`
-- 초안: `outcome/1_draft/{company}-draft-{추천버전}.md`
-- 출력: `outcome/3_review/{company}-review.md`
+- 검증 리포트: `outcome/{company}/2_verify/{company}-verify.md`
+- 초안: `outcome/{company}/1_draft/{company}-draft-{추천버전}.md`
+- 출력: `outcome/{company}/3_review/{company}-review.md`
 
 ## Process
 
 ### Step 1: 파일 로드
 
 ```
-Read: outcome/2_verify/{company}-verify.md    ← 추천 버전 확인
-Read: outcome/1_draft/{company}-draft-{추천버전}.md
+Read: outcome/{company}/2_verify/{company}-verify.md    ← 추천 버전 확인
+Read: outcome/{company}/1_draft/{company}-draft-{추천버전}.md
 ```
 
 ### Step 2: Summary/헤드라인 리뷰
@@ -72,12 +72,12 @@ STAR 밀도:
 
 ### Step 6: 결과 저장
 
-`outcome/3_review/{company}-review.md`에 저장:
+`outcome/{company}/3_review/{company}-review.md`에 저장:
 
 ```markdown
 # {company} 이력서 리뷰
 생성일: {date}
-리뷰 대상: outcome/1_draft/{company}-draft-{버전}.md
+리뷰 대상: outcome/{company}/1_draft/{company}-draft-{버전}.md
 
 ## 종합 평가
 점수: X/10 — 한 줄 평
@@ -115,6 +115,6 @@ STAR 밀도:
 ## Next Step
 
 ```
-✅ 리뷰 리포트 저장 완료 → outcome/3_review/
+✅ 리뷰 리포트 저장 완료 → outcome/{company}/3_review/
 → 다음 단계: /refine-resume 로 최종 완성본 생성
 ```

@@ -14,8 +14,8 @@ description: Use when given an original resume/career data and a job description
 
 **기본 경로** (oh-my-career 프로젝트):
 - 원본 이력서: `src/my-resume.md`
-- JD: `src/{company}-jd.md`
-- 출력: `outcome/1_draft/{company}-draft-{A|B|C}.md`
+- JD: `src/pending/{company}_jd.md` (또는 `src/applied/`)
+- 출력: `outcome/{company}/1_draft/{company}-draft-{A|B|C}.md`
 
 다른 파일을 쓰는 경우 사용자에게 경로를 확인하라.
 
@@ -90,7 +90,7 @@ JD에서 다음을 추출해 표로 정리:
 
 ### Step 4: 파일 저장
 
-각 버전을 `outcome/1_draft/{company}-draft-{A|B|C}.md`로 저장한다.
+각 버전을 `outcome/{company}/1_draft/{company}-draft-{A|B|C}.md`로 저장한다.
 
 파일명 예시: `kakao-style-draft-A.md`, `kakao-style-draft-B.md`, `kakao-style-draft-C.md`
 
@@ -129,8 +129,8 @@ JD에서 다음을 추출해 표로 정리:
 
 ```
 ✅ 3가지 초안 저장 완료
-  → outcome/1_draft/{company}-draft-A.md
-  → outcome/1_draft/{company}-draft-B.md
-  → outcome/1_draft/{company}-draft-C.md
+  → outcome/{company}/1_draft/{company}-draft-A.md
+  → outcome/{company}/1_draft/{company}-draft-B.md
+  → outcome/{company}/1_draft/{company}-draft-C.md
 → 다음 단계: /verify-resume 로 팩트체크 실행
 ```

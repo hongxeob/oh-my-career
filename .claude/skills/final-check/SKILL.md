@@ -12,13 +12,13 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 
 ## Input
 
-- JD: `src/{company}-jd.md`
-- 최종본: `outcome/4_refine/{company}-final.md`
+- JD: `src/pending/{company}_jd.md` (또는 `src/applied/`)
+- 최종본: `outcome/{company}/4_refine/{company}-final.md`
 - 원본(팩트 기준): `src/my-resume.md`
 
 ## Output
 
-- `outcome/4_refine/{company}-final-check.md`
+- `outcome/{company}/4_refine/{company}-final-check.md`
 
 ## Persona
 
@@ -52,12 +52,12 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 
 ## Output 형식
 
-`outcome/4_refine/{company}-final-check.md`에 아래 순서로 저장:
+`outcome/{company}/4_refine/{company}-final-check.md`에 아래 순서로 저장:
 
 ```markdown
 # {company} 최종 검토 (채용자 시각)
 생성일: {date}
-검토 대상: outcome/4_refine/{company}-final.md
+검토 대상: outcome/{company}/4_refine/{company}-final.md
 
 ## 1. 총평
 서류 통과 가능성: 높음 / 보통 / 낮음 — 이유 3줄 이내.
@@ -78,10 +78,10 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 ## Next Step
 
 ```
-✅ 최종 검토 완료 → outcome/4_refine/{company}-final-check.md
+✅ 최종 검토 완료 → outcome/{company}/4_refine/{company}-final-check.md
 
 통과 가능성 '높음/보통' + 수정 반영 완료 시:
-  → 우선순위 수정 리스트(산문 AI 티 포함)를 outcome/4_refine/{company}-final.md에 직접 반영
+  → 우선순위 수정 리스트(산문 AI 티 포함)를 outcome/{company}/4_refine/{company}-final.md에 직접 반영
   → /pdf-resume 로 제출본 생성
 
 '낮음'이면:
