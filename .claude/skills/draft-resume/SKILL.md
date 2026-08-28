@@ -14,8 +14,8 @@ description: Use when given an original resume/career data and a job description
 
 **기본 경로** (oh-my-career 프로젝트):
 - 원본 이력서: `src/my-resume.md`
-- JD: `src/{company}-jd.md`
-- 출력: `outcome/1_draft/{company}-draft-{A|B|C}.md`
+- JD: `src/pending/{company}_jd.md` (또는 `src/applied/`)
+- 출력: `outcome/{company}/1_draft/{company}-draft-{A|B|C}.md`
 
 다른 파일을 쓰는 경우 사용자에게 경로를 확인하라.
 
@@ -90,7 +90,7 @@ JD에서 다음을 추출해 표로 정리:
 
 ### Step 4: 파일 저장
 
-각 버전을 `outcome/1_draft/{company}-draft-{A|B|C}.md`로 저장한다.
+각 버전을 `outcome/{company}/1_draft/{company}-draft-{A|B|C}.md`로 저장한다.
 
 파일명 예시: `kakao-style-draft-A.md`, `kakao-style-draft-B.md`, `kakao-style-draft-C.md`
 
@@ -109,12 +109,19 @@ JD에서 다음을 추출해 표로 정리:
 ...
 
 ### 경력
-**[회사명]** | [직책] | [기간]
+**[회사명]** | [팀] · [직책] | [기간]
+
+> [회사/서비스 한 줄 소개 — 원본에 있는 사실만]
+
 - ...
+
+**기술 스택**: `기술` `기술` ...
 
 ### 스킬
 ...
 ```
+
+⚠️ **블록쿼트 소개와 회사별 기술 스택 줄을 초안 단계에서 이미 넣는다.** `/refine-resume` Step 3.5가 이 두 요소를 필수로 요구하므로, 초안에 없으면 refine에서 전 경력 항목을 재구조화해야 한다.
 
 출력 후 각 버전의 **전략적 의도 1줄 요약**을 추가한다.
 
@@ -125,12 +132,28 @@ JD에서 다음을 추출해 표로 정리:
 - JD와 무관한 경험은 압축하거나 제거한다
 - 생성 후 반드시 `/verify-resume` 실행을 안내한다
 
+### 하우스 스타일 (작성 시 준수 — 뒤에서 재작업 방지)
+
+전체 규칙은 `.claude/skills/final-check/house-style.md`. Summary 등 **산문 구간**에서 자주 걸리는 것:
+
+| 금지 | 대신 |
+|------|------|
+| 가운뎃점 나열 (`검색·전시`) | 쉼표, `~와/과`, 또는 진짜 병렬 명사만 슬래시 |
+| Em dash로 절 잇기 (`A했고 — B한`) | 접속사·연결어미로 녹임 |
+| 숫자 범위 물결표 (`20~30ms`) | 하이픈 (`20-30ms`) |
+| 피동형 (`개선되었습니다`) | 능동 (`개선했습니다`) |
+| 과잉 명사화 (`최적화를 진행했습니다`) | 동사 직접 (`최적화했습니다`) |
+| 무생물 주어 (`이 경험은 저를 성장시켰습니다`) | 사람 주어 (`이 경험으로 성장했습니다`) |
+| `~를 통해` 한 문단 2회 이상 | 문장 분리, `-며`/`-여`/쉼표 |
+
+개조식 bullet은 압축 표기 허용 — 단 가운뎃점 3개 이상 연쇄(`A·B·C·D`)는 bullet에서도 피한다.
+
 ## Next Step
 
 ```
 ✅ 3가지 초안 저장 완료
-  → outcome/1_draft/{company}-draft-A.md
-  → outcome/1_draft/{company}-draft-B.md
-  → outcome/1_draft/{company}-draft-C.md
+  → outcome/{company}/1_draft/{company}-draft-A.md
+  → outcome/{company}/1_draft/{company}-draft-B.md
+  → outcome/{company}/1_draft/{company}-draft-C.md
 → 다음 단계: /verify-resume 로 팩트체크 실행
 ```
