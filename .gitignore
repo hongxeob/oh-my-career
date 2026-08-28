@@ -7,9 +7,12 @@ backup/
 # Generated PDF / HTML (binary / personal output)
 *.pdf
 *.html
+# 단, 스킬 템플릿은 개인정보가 없는 소스 자산이므로 추적한다
+!.claude/skills/**/*.html
 
 # Profile photo
 src/photo.jpg
+src/photo-original-backup.jpg
 /.idea
 
 # oh-my-claudecode tool directories
@@ -19,6 +22,12 @@ src/photo.jpg
 # Personal real resume — never track
 src/my-resume.md
 
-# Company JDs — never track (keep example)
+# Company JDs — never track (any naming style, any location, keep example)
+src/*_jd.md
 src/*-jd.md
+src/applied/
+src/pending/
 !src/example-jd.md
+
+# Pipeline outputs — real personal resume content, never track (회사별 패키지 구조: outcome/{company}/{stage}/)
+outcome/

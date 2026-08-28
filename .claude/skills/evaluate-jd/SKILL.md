@@ -13,11 +13,11 @@ JD와 원본 이력서를 비교 분석해 **지원 적합도를 A-F 등급으�
 ## Input
 
 - 원본 이력서: `src/my-resume.md`
-- JD: `src/{company}-jd.md`
+- JD: `src/pending/{company}_jd.md` (진행 중인 회사면 `src/applied/`에 있을 수도 있음)
 
 ## Output
 
-- `outcome/0_evaluate/{company}-evaluate.md`
+- `outcome/{company}/0_evaluate/{company}-evaluate.md`
 
 ## Process
 
@@ -99,7 +99,7 @@ JD를 읽고 다음을 표로 정리:
 ### Step 5: 저장
 
 ```
-outcome/0_evaluate/{company}-evaluate.md
+outcome/{company}/0_evaluate/{company}-evaluate.md
 ```
 
 ## Critical Rules
@@ -112,7 +112,7 @@ outcome/0_evaluate/{company}-evaluate.md
 ## Next Step
 
 ```
-✅ JD 평가 완료 → outcome/0_evaluate/{company}-evaluate.md
+✅ JD 평가 완료 → outcome/{company}/0_evaluate/{company}-evaluate.md
 
 등급 B 이상이면:
   → /draft-resume 로 맞춤 이력서 초안 생성

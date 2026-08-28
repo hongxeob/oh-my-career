@@ -14,18 +14,18 @@ description: Use when resume drafts have been created and need fact-checking aga
 
 **기본 경로** (oh-my-career 프로젝트):
 - 원본 이력서: `src/my-resume.md`
-- JD: `src/{company}-jd.md`
-- 검증 대상: `outcome/1_draft/{company}-draft-*.md`
-- 출력: `outcome/2_verify/{company}-verify.md`
+- JD: `src/pending/{company}_jd.md` (또는 `src/applied/`)
+- 검증 대상: `outcome/{company}/1_draft/{company}-draft-*.md`
+- 출력: `outcome/{company}/2_verify/{company}-verify.md`
 
 ## Process
 
 ### Step 1: 파일 로드
 
 ```
-Read: src/my-resume.md          ← 팩트 기준
-Read: src/{company}-jd.md       ← JD 기준
-Read: outcome/1_draft/          ← 검증할 초안들
+Read: src/my-resume.md                        ← 팩트 기준
+Read: src/pending/{company}_jd.md              ← JD 기준
+Read: outcome/{company}/1_draft/               ← 검증할 초안들
 ```
 
 ### Step 2: 팩트 검증
@@ -67,12 +67,12 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 
 ### Step 5: 결과 저장
 
-`outcome/2_verify/{company}-verify.md`에 저장:
+`outcome/{company}/2_verify/{company}-verify.md`에 저장:
 
 ```markdown
 # {company} 이력서 검증 리포트
 생성일: {date}
-검증 대상: outcome/1_draft/{company}-draft-*.md
+검증 대상: outcome/{company}/1_draft/{company}-draft-*.md
 
 ## 팩트 검증 결과
 [Step 2 표]
@@ -91,8 +91,18 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 - [ ] ⚠️ 항목 1: ...
 
 ## 추천 버전
-최종 진행 추천: Version [A/B/C] — 이유: ...
+최종 진행 추천: Version [A/B/C] 또는 하이브리드 — 이유: ...
 ```
+
+**하이브리드 추천이 가능하다.** 한 버전이 통째로 이기지 않는 경우가 흔하므로, 그때는 아래 형식으로 적는다:
+
+```
+최종 진행 추천: B 베이스 + A의 [구체적 요소] 이식
+- 베이스가 B인 이유: ...
+- A에서 가져올 것: [섹션/bullet을 구체적으로 지목]
+```
+
+베이스 버전과 이식할 요소를 **파일·섹션 단위로 지목**해야 refine 단계에서 그대로 조립할 수 있다.
 
 ## Critical Rules
 
@@ -103,6 +113,6 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 ## Next Step
 
 ```
-✅ 검증 리포트 저장 완료 → outcome/2_verify/
+✅ 검증 리포트 저장 완료 → outcome/{company}/2_verify/
 → 다음 단계: /review-resume 로 품질 리뷰 실행
 ```
