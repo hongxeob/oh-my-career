@@ -17,14 +17,14 @@ description: Use when a résumé is finalized and the application also asks for 
 ## Input
 
 - 팩트 기준: `src/my-resume.md`
-- 강조점 파악: `outcome/4_refine/{company}-final.md`
-- 프로젝트 우선순위: `src/{company}-jd.md` (JD에 중요한 프로젝트를 flagship으로)
+- 강조점 파악: `outcome/{company}/4_refine/{company}-final.md`
+- 프로젝트 우선순위: `src/pending/{company}_jd.md` (또는 `src/applied/`) — JD에 중요한 프로젝트를 flagship으로
 - 선택: instruction/ 이미지·배경 자료 (있으면 문제 정의에 반영, 단 PDF엔 외부 이미지 임베드 금지 — §Critical 참조)
 
 ## Output
 
-- `outcome/6_portfolio/{company}-portfolio.html`
-- `outcome/6_portfolio/{company}-portfolio.pdf`
+- `outcome/{company}/6_portfolio/{company}-portfolio.html`
+- `outcome/{company}/6_portfolio/{company}-portfolio.pdf`
 
 ## Design Rubric (작성 시 강제)
 
@@ -39,7 +39,7 @@ description: Use when a résumé is finalized and the application also asks for 
 
 ### Step 1: 로드 및 flagship 선정
 ```
-Read: src/my-resume.md, outcome/4_refine/{company}-final.md, src/{company}-jd.md
+Read: src/my-resume.md, outcome/{company}/4_refine/{company}-final.md, src/pending/{company}_jd.md
 ```
 JD 핵심 요구와 최상위로 매칭되는 프로젝트 2~3개 선정. 각 프로젝트에 원본에서 쓸 수 있는
 `문제 / 설계결정 / 트러블슈팅 / 수치` 재료가 충분한지 확인 (부족하면 다른 프로젝트로 교체).
@@ -73,14 +73,14 @@ before/after = `.diagram > .dcol(Before) + .dvs(→) + .dcol(After)`.
 정상/장애 = `.flow`에 `.box` 나열 + `→`.
 
 프린트 CSS: `@page { size:A4; margin:16mm }`, Noto Sans KR 임베드, `li{break-inside:avoid}`,
-`.page{break-before:page}`. 참고 구현: `outcome/6_portfolio/tving-portfolio.html`.
+`.page{break-before:page}`. 참고 구현: `outcome/tving/6_portfolio/tving-portfolio.html`.
 
 ### Step 3: PDF 변환
 ```bash
 pkill -f "Google Chrome" 2>/dev/null; sleep 1
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
-  --print-to-pdf="outcome/6_portfolio/{company}-portfolio.pdf" --no-pdf-header-footer \
-  "file:///$(pwd)/outcome/6_portfolio/{company}-portfolio.html"
+  --print-to-pdf="outcome/{company}/6_portfolio/{company}-portfolio.pdf" --no-pdf-header-footer \
+  "file:///$(pwd)/outcome/{company}/6_portfolio/{company}-portfolio.html"
 ```
 
 ### Step 4: 렌더 게이트 (자동 루프)
@@ -98,7 +98,7 @@ for p in $(seq 1 N); do pdftotext -f $p -l $p ...pdf - | grep -v '^$' | head -2;
 | 게이트 | 방법 | 통과 기준 |
 |--------|------|-----------|
 | 팩트 | 포트폴리오 수치/주장 vs `my-resume.md` 대조 | 날조 0 |
-| 중복 | 경력기술서(`4_refine`)와 문장 중복 확인 | 재탕 아닌 심화 |
+| 중복 | 경력기술서(`outcome/{company}/4_refine/`)와 문장 중복 확인 | 재탕 아닌 심화 |
 | 깊이 | 프로젝트별 `문제+설계결정(왜)+트러블슈팅/다이어그램+수치` | 4요소 구비 |
 | 렌더 | Step 4 페이지별 스캔 | 빈 페이지·오버플로우 0, 3~6p |
 | 채용자 시각 | final-check 페르소나 "면접 부르고 싶은가" | 보통 이상 |
@@ -113,7 +113,7 @@ for p in $(seq 1 N); do pdftotext -f $p -l $p ...pdf - | grep -v '^$' | head -2;
 ## Next Step
 
 ```
-✅ 포트폴리오 완료 → outcome/6_portfolio/{company}-portfolio.pdf
+✅ 포트폴리오 완료 → outcome/{company}/6_portfolio/{company}-portfolio.pdf
 
 경력기술서(PDF/텍스트박스)와 함께 제출:
   - 경력기술서 텍스트박스 ← 4_refine 기반 plain text

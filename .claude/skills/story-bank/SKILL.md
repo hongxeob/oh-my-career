@@ -13,13 +13,13 @@ description: Use when the user wants to build or update their interview story ba
 ## Input
 
 - 원본 이력서: `src/my-resume.md`
-- JD (선택): `src/{company}-jd.md` — 있으면 해당 JD 맞춤, 없으면 범용 스토리 뱅크 생성
-- 기존 평가 (선택): `outcome/0_evaluate/{company}-evaluate.md` — 있으면 예상 질문 활용
+- JD (선택): `src/pending/{company}_jd.md` (또는 `src/applied/`) — 있으면 해당 JD 맞춤, 없으면 범용 스토리 뱅크 생성
+- 기존 평가 (선택): `outcome/{company}/0_evaluate/{company}-evaluate.md` — 있으면 예상 질문 활용
 
 ## Output
 
-- 범용 스토리 뱅크: `outcome/interview/story-bank.md` (최초 1회 생성, 이후 누적 업데이트)
-- 회사별 면접 준비: `outcome/interview/{company}-interview.md`
+- 범용 스토리 뱅크: `outcome/interview/story-bank.md` (회사 공통 자산, 최상위 유지 — 최초 1회 생성, 이후 누적 업데이트)
+- 회사별 면접 준비: `outcome/{company}/interview/{company}-interview.md`
 
 ## Process
 
@@ -98,7 +98,7 @@ JD와 평가 리포트를 기반으로 예상 질문을 생성하고 마스터 �
 ### Step 4: 저장
 
 - 범용: `outcome/interview/story-bank.md`
-- 회사별: `outcome/interview/{company}-interview.md`
+- 회사별: `outcome/{company}/interview/{company}-interview.md`
 
 ## Critical Rules
 
@@ -118,6 +118,6 @@ JD와 평가 리포트를 기반으로 예상 질문을 생성하고 마스터 �
   → /story-bank {company} 로 회사별 면접 준비 가능
 
 회사별 모드:
-  → outcome/interview/{company}-interview.md 생성 완료
+  → outcome/{company}/interview/{company}-interview.md 생성 완료
   → 예상 질문 + 스토리 매칭 확인 후 면접 준비
 ```

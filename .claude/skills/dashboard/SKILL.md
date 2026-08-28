@@ -15,54 +15,51 @@ description: Use when you want to visualize the resume pipeline status. Triggers
 
 ### Step 1: 회사 감지
 
-`outcome/` 하위 5개 폴더를 모두 스캔해 `{company}-*.md` 패턴 파일에서 회사명을 유니크하게 수집한다.
+`outcome/` 바로 아래 서브폴더 목록이 곧 회사 목록이다 (회사별 패키지 구조: `outcome/{company}/{stage}/`).
 
 ```
-Glob: outcome/1_draft/*-draft-A.md   → 주요 감지 소스
-Glob: outcome/2_verify/*-verify.md
-Glob: outcome/3_review/*-review.md
-Glob: outcome/4_refine/*-final.md
-Glob: outcome/5_pdf/*-final.html
-Glob: outcome/5_pdf/*-final.pdf
+Glob: outcome/*/0_evaluate/*-evaluate.md   (또는 outcome/*/ 자체를 디렉토리 목록으로 스캔)
 ```
 
-파일명에서 회사명 파싱 규칙:
-- `kakao-style-draft-A.md` → 회사명: `kakao-style`
-- `naver-verify.md` → 회사명: `naver`
-- `toss-final.html` → 회사명: `toss`
-
-수집한 회사명 중복 제거 후 알파벳 순 정렬.
+`outcome/interview/`(공통 스토리 뱅크 전용, 회사 아님)는 회사 목록에서 제외한다.
+회사명 중복 제거 후 알파벳 순 정렬.
 
 ### Step 2: 단계별 존재 확인 (회사마다)
 
-각 회사에 대해 아래 파일 존재 여부를 확인한다:
+각 회사 폴더 `outcome/{company}/` 아래 파일 존재 여부를 확인한다:
 
 | 단계 | 파일 | done 조건 |
 |------|------|-----------|
-| draft | `outcome/1_draft/{company}-draft-A.md` | A 파일 존재 |
-| verify | `outcome/2_verify/{company}-verify.md` | 존재 |
-| review | `outcome/3_review/{company}-review.md` | 존재 |
-| refine | `outcome/4_refine/{company}-final.md` | 존재 |
-| pdf | `outcome/5_pdf/{company}-final.html` 또는 `-final.pdf` | 둘 중 하나 존재 |
+| draft | `outcome/{company}/1_draft/{company}-draft-A.md` | A 파일 존재 |
+| verify | `outcome/{company}/2_verify/{company}-verify.md` | 존재 |
+| review | `outcome/{company}/3_review/{company}-review.md` | 존재 |
+| refine | `outcome/{company}/4_refine/{company}-final.md` | 존재 |
+| pdf | `outcome/{company}/5_pdf/{company}-final.html` 또는 `-final.pdf` | 둘 중 하나 존재 |
 
 draft의 B, C 파일도 각각 존재 여부 확인:
-- `outcome/1_draft/{company}-draft-B.md`
-- `outcome/1_draft/{company}-draft-C.md`
+- `outcome/{company}/1_draft/{company}-draft-B.md`
+- `outcome/{company}/1_draft/{company}-draft-C.md`
 
 ### Step 3: 파일 읽기
 
 존재하는 MD 파일을 Read 도구로 전부 읽어 내용 수집:
 
 ```
-Read: outcome/1_draft/{company}-draft-A.md  (있는 경우)
-Read: outcome/1_draft/{company}-draft-B.md  (있는 경우)
-Read: outcome/1_draft/{company}-draft-C.md  (있는 경우)
-Read: outcome/2_verify/{company}-verify.md  (있는 경우)
-Read: outcome/3_review/{company}-review.md  (있는 경우)
-Read: outcome/4_refine/{company}-final.md   (있는 경우)
+Read: outcome/{company}/1_draft/{company}-draft-A.md  (있는 경우)
+Read: outcome/{company}/1_draft/{company}-draft-B.md  (있는 경우)
+Read: outcome/{company}/1_draft/{company}-draft-C.md  (있는 경우)
+Read: outcome/{company}/2_verify/{company}-verify.md  (있는 경우)
+Read: outcome/{company}/3_review/{company}-review.md  (있는 경우)
+Read: outcome/{company}/4_refine/{company}-final.md   (있는 경우)
 ```
 
 HTML/PDF 파일은 읽지 않는다.
+
+### Step 3.5: 회사명 파싱 규칙 (참고)
+
+폴더명이 곧 회사명이므로 파일명에서 다시 파싱할 필요는 없다:
+- `outcome/kakao-style/1_draft/kakao-style-draft-A.md` → 회사명: `kakao-style`
+- `outcome/toss/2_verify/toss-verify.md` → 회사명: `toss`
 
 ### Step 4: 다음 단계 커맨드 결정 (회사마다)
 
