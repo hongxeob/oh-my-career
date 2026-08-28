@@ -13,6 +13,7 @@ description: Use when a finalized resume markdown exists and needs to be convert
 ## Input
 
 - `outcome/{company}/4_refine/{company}-final.md` — refine-resume 단계 완성본
+- `.claude/skills/pdf-resume/template.html` — HTML/CSS 템플릿 (CSS를 매번 새로 쓰지 않는다)
 - `src/photo.jpg` — 프로필 사진 (있을 때만 삽입, 없으면 생략)
 
 ## Output
@@ -36,88 +37,35 @@ Read: outcome/{company}/4_refine/{company}-final.md
 - 폴더명/파일명에서 `{company}` 자동 파싱 (예: `outcome/kakao-style/4_refine/kakao-style-final.md` → `kakao-style`)
 - `src/photo.jpg` 존재 여부 확인
 
-### Step 2: HTML 변환
+### Step 2: HTML 변환 (템플릿 치환)
 
-마크다운을 아래 구조의 완전한 HTML 문서로 변환한다.
+**CSS를 직접 작성하지 않는다.** 같은 디렉토리의 `template.html`을 읽어 placeholder만 치환한다.
 
-**헤더 섹션** — 이름·직함·연락처 + 사진 (우상단):
-```html
-<header>
-  <div class="header-info">
-    <h1>{이름}</h1>
-    <p class="title">{직함}</p>
-    <p class="contact">{이메일} | {전화} | {GitHub/링크}</p>
-  </div>
-  <!-- photo.jpg 존재 시만 포함 -->
-  <img class="photo" src="../../../src/photo.jpg" alt="프로필 사진">
-</header>
 ```
-(출력 경로가 `outcome/{company}/5_pdf/`로 한 단계 더 깊어졌으므로 상대경로는 `../../../src/photo.jpg`)
-
-**인쇄 CSS 필수 포함**:
-```css
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-
-@page {
-  size: A4;
-  margin: 18mm;
-}
-
-@media print {
-  body { padding: 0; margin: 0; }
-  .no-print { display: none; }
-}
-
-body {
-  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-  font-size: 10pt;
-  line-height: 1.6;
-  color: #222;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8mm;
-}
-
-.photo {
-  width: 30mm;
-  height: 38mm;
-  object-fit: cover;
-  object-position: center top;
-  border-radius: 2px;
-}
-
-section {
-  break-inside: avoid;
-  margin-bottom: 6mm;
-}
-
-h2 {
-  font-size: 11pt;
-  font-weight: 700;
-  border-bottom: 1px solid #333;
-  padding-bottom: 2px;
-  margin-bottom: 4px;
-}
-
-ul { padding-left: 1.2em; margin: 2px 0; }
-li { margin-bottom: 2px; }
-li > ul { margin: 2px 0 2px 0; }
-li > ul > li { font-size: 9pt; color: #333; margin-bottom: 1px; }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 9.5pt;
-}
-th, td { padding: 3px 6px; border: 1px solid #ddd; }
-th { background: #f5f5f5; font-weight: 600; }
+Read: .claude/skills/pdf-resume/template.html
 ```
 
-**섹션 구조**: 각 섹션을 `<section>` 태그로 감싼다. 페이지 분리가 필요한 섹션에는 `style="break-before: page;"` 추가.
+치환 대상:
+
+| Placeholder | 채울 내용 |
+|-------------|----------|
+| `{{NAME}}` / `{{COMPANY_LABEL}}` | 이름 / 지원 회사명(title 태그용) |
+| `{{JOB_TITLE}}` | 직함 (예: Backend Engineer) |
+| `{{CONTACT_LINE}}` | 이메일·전화·GitHub·Blog·LinkedIn (`<a>` 링크 포함) |
+| `{{PHOTO}}` 주석 블록 | `src/photo.jpg` 있으면 `<img class="photo">` 유지, 없으면 img 태그째 삭제 |
+| `{{SUMMARY}}` | 최종본 Summary 문단 |
+| `{{CAREER_BLOCKS}}` | 회사마다 `.company-block` 반복 (아래 규칙) |
+| `{{STACK_ROWS}}` | 기술 스택 표 행 (JD 필수 기술이 위로) |
+
+`.company-block` 반복 규칙:
+- `.company-header` = 회사명·팀·직책 + 기간
+- `.company-intro` = 최종본의 `>` 블록쿼트 한 줄
+- 최종본에 `####` 소제목이 있으면 `<h4>`로, 없으면 `<ul>`만
+- `.stack` = 회사별 기술 스택 줄, 기술마다 `<code>` 하나씩
+
+템플릿 CSS는 손대지 않는다. 분량 조정이 필요하면 Step 4 렌더 확인 후 `font-size`/`margin`만 미세 조정한다.
+
+**⚠️ `break-inside: avoid` 추가 금지** — `section`이나 `.company-block`에 걸면 큰 블록이 통째로 다음 페이지로 밀려 앞 페이지가 절반 빈 채 3페이지가 된다. 템플릿에서 의도적으로 뺀 속성이다.
 
 **서브 불렛 가이드라인** — 가독성을 위해 긴 bullet은 중첩 `<ul>`로 분리한다:
 
@@ -160,6 +108,22 @@ HTML 저장 완료 후 Chrome headless 명령을 실행한다:
 - Bash 실행이 가능한 경우 직접 실행하여 PDF 생성 완료 확인
 - 실행 실패 시 위 명령어를 사용자에게 출력하고 수동 실행 안내
 
+**페이지 수 확인 (필수)** — 같은 명령에 이어 붙여 한 번에 확인한다:
+
+```bash
+pdfinfo outcome/{company}/5_pdf/{company}-final.pdf | grep -E "Pages|File size"
+```
+
+`grep -c "/Type /Page"`로 세지 말 것 — `/Type /Pages`까지 잡혀 부정확하다.
+
+목표는 2페이지. 3페이지가 나오면 페이지 경계를 확인한다:
+
+```bash
+pdftotext -layout outcome/{company}/5_pdf/{company}-final.pdf - | awk 'BEGIN{p=1} /\f/{p++;next}{print p": "$0}'
+```
+
+앞 페이지가 절반 넘게 비었는데 다음 페이지가 꽉 차 있으면 `break-inside: avoid` 계열이 원인이다(Step 2 경고 참조). 콘텐츠를 줄이기 전에 CSS부터 의심할 것.
+
 ### Step 5: JD 파일 pending → applied 이동
 
 PDF 생성 확인 후, `src/pending/{company}_jd.md`(또는 `{company}-jd.md`)가 존재하면 `src/applied/`로 이동한다(`mv`).
@@ -169,6 +133,7 @@ PDF 생성 확인 후, `src/pending/{company}_jd.md`(또는 `{company}-jd.md`)�
 
 - **콘텐츠 수정 금지** — 마크다운의 텍스트를 한 글자도 바꾸지 않는다
 - **4_refine 파일 없으면 즉시 중단** — 이전 단계 건너뛰기 방지
+- **CSS 재작성 금지** — `template.html`을 읽어 placeholder만 치환한다. 스타일을 바꿔야 하면 템플릿 파일 자체를 고쳐 모든 회사에 반영되게 한다
 - **사진은 있을 때만** — `src/photo.jpg` 없으면 사진 영역 자체를 생략
 - **px 단위 사용 금지** — 사진·여백은 반드시 mm 단위 (px는 인쇄 시 축소됨)
 

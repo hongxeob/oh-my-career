@@ -52,7 +52,7 @@ review ❌ 항목 처리:
 - 기술 스택 순서 조정 (JD 필수 기술 상단)
 - 전체 길이/밀도 최종 조정
 
-### Step 3.5: 경력 항목 표준 포맷 (outcome/kakao-pay-sec/4_refine/kakao-pay-sec-final.md 기준)
+### Step 3.5: 경력 항목 표준 포맷
 
 모든 경력 항목(각 회사)은 다음 두 요소를 반드시 포함한다:
 

@@ -1,0 +1,158 @@
+<title>{{NAME}} 이력서 — {{COMPANY_LABEL}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+@page {
+  size: A4;
+  margin: 18mm;
+}
+
+@media print {
+  body { padding: 0; margin: 0; }
+  .no-print { display: none; }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  font-size: 10pt;
+  line-height: 1.6;
+  color: #222;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8mm;
+}
+
+header h1 { font-size: 18pt; margin: 0 0 2px 0; }
+header .title { font-size: 11pt; color: #444; margin: 0 0 4px 0; }
+header .contact { font-size: 9pt; color: #555; margin: 0; }
+header .contact a { color: #555; text-decoration: none; }
+
+.photo {
+  width: 30mm;
+  height: 38mm;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 2px;
+}
+
+/* break-inside: avoid 금지 — section/.company-block에 걸면 큰 블록이 통째로
+   다음 페이지로 밀려 앞 페이지 절반이 빈 채로 3페이지가 된다 (실측 확인됨). */
+section {
+  margin-bottom: 6mm;
+}
+
+h2 {
+  font-size: 11pt;
+  font-weight: 700;
+  border-bottom: 1px solid #333;
+  padding-bottom: 2px;
+  margin-bottom: 4px;
+}
+
+h4 {
+  font-size: 10pt;
+  font-weight: 700;
+  margin: 5px 0 3px 0;
+  color: #333;
+}
+
+.company-block {
+  margin-bottom: 5mm;
+}
+
+.company-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5pt;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.company-intro {
+  font-size: 9pt;
+  color: #555;
+  border-left: 2px solid #ddd;
+  padding-left: 6px;
+  margin: 2px 0 5px 0;
+}
+
+ul { padding-left: 1.2em; margin: 2px 0; }
+li { margin-bottom: 3px; }
+li > ul { margin: 2px 0; }
+li > ul > li { font-size: 9pt; color: #333; margin-bottom: 1px; }
+
+.stack {
+  font-size: 9pt;
+  color: #444;
+  margin-top: 4px;
+}
+.stack code {
+  background: #f2f2f2;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 8.5pt;
+  margin-right: 2px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9.5pt;
+}
+th, td { padding: 3px 6px; border: 1px solid #ddd; }
+th { background: #f5f5f5; font-weight: 600; text-align: left; }
+</style>
+
+<header>
+  <div class="header-info">
+    <h1>{{NAME}}</h1>
+    <p class="title">{{JOB_TITLE}}</p>
+    <p class="contact">{{CONTACT_LINE}}</p>
+  </div>
+  <!-- {{PHOTO}} — src/photo.jpg 있을 때만 아래 한 줄 유지, 없으면 통째로 삭제.
+       출력이 outcome/{company}/5_pdf/ 이므로 상대경로는 ../../../src/photo.jpg -->
+  <img class="photo" src="../../../src/photo.jpg" alt="프로필 사진">
+</header>
+
+<section>
+  <h2>Summary</h2>
+  <p>{{SUMMARY}}</p>
+</section>
+
+<section>
+  <h2>경력</h2>
+  <!-- {{CAREER_BLOCKS}} — 회사마다 아래 .company-block 반복.
+       소제목(h4)이 없는 회사는 h4 없이 <ul>만 둔다. -->
+  <div class="company-block">
+    <div class="company-header">
+      <span>{{COMPANY_NAME}} | {{TEAM_ROLE}}</span>
+      <span>{{PERIOD}}</span>
+    </div>
+    <p class="company-intro">{{COMPANY_INTRO}}</p>
+
+    <h4>{{SUBHEADING}}</h4>
+    <ul>
+      <li><strong>{{IMPACT}}</strong>: {{DETAIL}}</li>
+    </ul>
+
+    <p class="stack"><code>{{TECH}}</code></p>
+  </div>
+</section>
+
+<section>
+  <h2>기술 스택 (전체)</h2>
+  <table>
+    <tr><th>구분</th><th>기술</th></tr>
+    <!-- {{STACK_ROWS}} — JD 필수 기술이 위로 오도록 정렬 -->
+    <tr><td>{{CATEGORY}}</td><td>{{ITEMS}}</td></tr>
+  </table>
+</section>

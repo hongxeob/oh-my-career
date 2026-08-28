@@ -7,6 +7,8 @@ backup/
 # Generated PDF / HTML (binary / personal output)
 *.pdf
 *.html
+# 단, 스킬 템플릿은 개인정보가 없는 소스 자산이므로 추적한다
+!.claude/skills/**/*.html
 
 # Profile photo
 src/photo.jpg
