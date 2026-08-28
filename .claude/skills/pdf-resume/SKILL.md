@@ -7,7 +7,7 @@ description: Use when a finalized resume markdown exists and needs to be convert
 
 ## Overview
 
-`outcome/4_refine/{company}-final.md`를 **스타일드 HTML로 변환하고 PDF를 생성**한다.
+`outcome/{company}/4_refine/{company}-final.md`를 **스타일드 HTML로 변환하고 PDF를 생성**한다.
 이 단계는 콘텐츠를 수정하지 않는다 — 레이아웃과 프레젠테이션만 처리한다.
 
 ## Input

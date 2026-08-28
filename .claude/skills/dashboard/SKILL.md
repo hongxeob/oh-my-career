@@ -9,6 +9,20 @@ description: Use when you want to visualize the resume pipeline status. Triggers
 
 `outcome/` 폴더를 스캔해 회사별 파이프라인 진행 상태를 읽고, 브라우저에서 바로 열 수 있는 자기 완결형 `dashboard.html`을 프로젝트 루트에 생성한다.
 
+## 실행 모드 (인자에 따라 읽는 양이 다르다)
+
+`dashboard.html`은 자기 완결형이라 MD 콘텐츠를 파일 안에 임베드해야 한다.
+회사가 20개면 전 회사 전 단계를 임베드할 때 산출물 전체가 컨텍스트에 올라가므로, 기본은 **현황 모드**다.
+
+| 호출 | 모드 | 읽는 파일 | 용도 |
+|------|------|----------|------|
+| `/dashboard` | **현황 모드** (기본) | MD 본문을 읽지 않음 — 파일 **존재 여부만** 확인 | 전체 진행 상황 한눈에 |
+| `/dashboard {company}` | **상세 모드** | 해당 회사 MD만 전부 Read | 특정 회사 산출물 열람 |
+| `/dashboard --all` | **전체 상세** | 전 회사 MD 전부 Read (느리고 토큰 많이 씀) | 명시 요청 시에만 |
+
+**현황 모드에서는 Step 3(파일 읽기)을 건너뛴다.** 스테퍼·다음 단계 커맨드만 렌더하고,
+콘텐츠 탭 자리에는 "이 회사 상세는 `/dashboard {company}` 로 열람" 안내를 넣는다.
+
 ---
 
 ## Process
@@ -40,9 +54,11 @@ draft의 B, C 파일도 각각 존재 여부 확인:
 - `outcome/{company}/1_draft/{company}-draft-B.md`
 - `outcome/{company}/1_draft/{company}-draft-C.md`
 
-### Step 3: 파일 읽기
+### Step 3: 파일 읽기 (상세 모드에서만)
 
-존재하는 MD 파일을 Read 도구로 전부 읽어 내용 수집:
+**현황 모드면 이 단계를 통째로 건너뛴다** — 모든 `content`를 `null`로 두고 Step 4로 간다.
+
+상세 모드일 때만, 대상 회사의 존재하는 MD 파일을 Read 도구로 읽어 내용 수집:
 
 ```
 Read: outcome/{company}/1_draft/{company}-draft-A.md  (있는 경우)
@@ -147,7 +163,9 @@ oh-my-career Dashboard  |  생성: {generatedAt}
 - `marked.js`로 렌더링
 - `max-height: 65vh; overflow-y: auto;`
 - 흰색 배경(`--content-bg`), 패딩 24px
-- `content: null`인 탭은 "아직 생성되지 않았습니다" 안내
+- `content: null`인 탭 안내 문구는 모드에 따라 다르다:
+  - 단계 미완료 → "아직 생성되지 않았습니다"
+  - 현황 모드라 안 읽음 → "상세 열람: `/dashboard {company}`"
 
 **6. 다음 단계 박스 (하단 고정)**
 ```
@@ -169,7 +187,8 @@ oh-my-career Dashboard  |  생성: {generatedAt}
 
 ## Critical Rules
 
-- 회사명은 파일명에서 자동 파싱 — 사용자 입력 불필요
+- 회사명은 폴더명에서 자동 감지 — 사용자 입력 불필요
+- **기본은 현황 모드** — 인자 없이 호출됐는데 전 회사 MD를 읽지 않는다
 - MD 콘텐츠를 요약하거나 수정하지 않음 — 원문 그대로 임베드
 - HTML/PDF 파일은 콘텐츠 탭에 표시하지 않음 (존재 여부만 확인)
 - `dashboard.html`은 항상 프로젝트 루트에 덮어씌워 저장
