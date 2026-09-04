@@ -20,9 +20,13 @@ oh-my-career/
     │   ├── 4_refine/         # 마크다운 최종본
     │   ├── 5_pdf/            # HTML + PDF 제출본
     │   ├── 6_portfolio/      # 딥다이브 포트폴리오 (선택 — 첨부 요구 시)
-    │   └── interview/        # 회사별 면접 준비
-    └── interview/
-        └── story-bank.md     # STAR+R 스토리 뱅크 (회사 공통, 최상위 유지)
+    │   └── interview/        # 회사별 면접 준비 + 복기 리포트·녹취
+    └── interview/           # 회사 공통 자산 (최상위 유지)
+        ├── story-bank.md     # STAR+R 스토리 뱅크
+        ├── debrief-index.md  # 면접 복기 회차 누적 + 반복 지적 추적
+        ├── question-bank.md  # 실제로 받은 질문 은행 (회사 무관 누적)
+        ├── whiteboard-3frames.md # 화이트보드 3프레임 (AS-IS/선택지/TO-BE) — 스토리별 표
+        └── cdc-pipeline-script.md # 색인 파이프라인 대본 (회사 무관) — §7만 회사별로 채움
 ```
 
 회사 단위로 진행 상황을 체크하므로 `outcome/{company}/`가 최상위 단위다. 신규 JD는 `outcome/{company}/` 폴더를 새로 만들고 그 안에 단계별 하위폴더를 채워나간다.
@@ -41,7 +45,11 @@ outcome/{company}/5_pdf/{company}-final.pdf
 outcome/{company}/6_portfolio/{company}-portfolio.html
 outcome/{company}/6_portfolio/{company}-portfolio.pdf
 outcome/{company}/interview/{company}-interview.md
+outcome/{company}/interview/{company}-debrief-{N}차.md
+outcome/{company}/interview/raw/{company}-{N}차-녹취.md
 outcome/interview/story-bank.md
+outcome/interview/whiteboard-3frames.md
+outcome/interview/cdc-pipeline-script.md
 ```
 
 예: 카카오스타일 → `outcome/kakao-style/1_draft/kakao-style-draft-A.md`, `outcome/kakao-style/2_verify/kakao-style-verify.md` ...
@@ -59,6 +67,7 @@ outcome/interview/story-bank.md
 | 5 | `/pdf-resume` | MD 최종본 → HTML + PDF 변환 |
 | 6 | `/portfolio` | 딥다이브 포트폴리오 생성 (선택 — 포트폴리오 첨부 요구 시) |
 | - | `/story-bank` | STAR+R 스토리 뱅크 생성 + 회사별 면접 준비 |
+| - | `/interview-debrief` | 면접 녹취 → 시니어 면접관 시각 복기 리포트 + 회차 누적 추적 |
 | - | `/dashboard` | 회사별 파이프라인 진행 현황 HTML 생성 (`/dashboard {company}`로 상세 열람) |
 
 ## 핵심 규칙
