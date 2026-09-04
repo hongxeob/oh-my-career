@@ -20,31 +20,39 @@ JD를 분석해 맞춤 이력서를 자동 생성하고, 면접까지 준비하�
 ## 파이프라인 개요
 
 ```
-src/my-resume.md  +  src/{company}-jd.md
+src/my-resume.md  +  src/pending/{company}_jd.md
           │
           ▼
-  /evaluate-jd    →  outcome/0_evaluate/{company}-evaluate.md   (사전 필터)
+  /evaluate-jd       →  outcome/{company}/0_evaluate/{company}-evaluate.md   (사전 필터)
           │
           ▼
-   /draft-resume  →  outcome/1_draft/{company}-draft-{A|B|C}.md
+   /draft-resume     →  outcome/{company}/1_draft/{company}-draft-{A|B|C}.md
           │
           ▼
-  /verify-resume  →  outcome/2_verify/{company}-verify.md
+  /verify-resume     →  outcome/{company}/2_verify/{company}-verify.md
           │
           ▼
-  /review-resume  →  outcome/3_review/{company}-review.md
+  /review-resume     →  outcome/{company}/3_review/{company}-review.md
           │
           ▼
-  /refine-resume  →  outcome/4_refine/{company}-final.md
+  /refine-resume     →  outcome/{company}/4_refine/{company}-final.md
           │
           ▼
-  /final-check    →  outcome/4_refine/{company}-final-check.md   (채용자 시각 최종 게이트)
+  /final-check       →  outcome/{company}/4_refine/{company}-final-check.md  (채용자 시각 최종 게이트)
           │
           ▼
-    /pdf-resume   →  outcome/5_pdf/{company}-final.html + .pdf
+    /pdf-resume      →  outcome/{company}/5_pdf/{company}-final.html + .pdf
+          │              └─ 완료 시 JD를 src/pending/ → src/applied/ 로 이동
+          ▼
+    /portfolio       →  outcome/{company}/6_portfolio/{company}-portfolio.html + .pdf  (선택)
 
-  /story-bank     →  outcome/interview/story-bank.md            (면접 준비)
-                      outcome/interview/{company}-interview.md
+  ── 면접 ──────────────────────────────────────────────────
+
+  /story-bank        →  outcome/interview/story-bank.md              (회사 공통)
+                        outcome/{company}/interview/{company}-interview.md
+  /interview-debrief →  outcome/{company}/interview/{company}-debrief-{N}차.md
+                        outcome/interview/debrief-index.md           (회차 누적)
+                        outcome/interview/question-bank.md           (질문 은행)
 ```
 
 ---
@@ -55,8 +63,9 @@ src/my-resume.md  +  src/{company}-jd.md
 
 ```
 src/
-├── my-resume.md      ← 내 원본 이력서 작성 (팩트 기준, 절대 수정 금지)
-└── {company}-jd.md   ← 지원 회사 JD 붙여넣기
+├── my-resume.md              ← 내 원본 이력서 작성 (팩트 기준, 절대 수정 금지)
+├── pending/{company}_jd.md   ← 미지원·진행중 JD 붙여넣기
+└── applied/{company}_jd.md   ← /pdf-resume 완료 시 자동 이동
 ```
 
 > `{company}` 예시: `kakao`, `toss`, `line-plus` 등 회사명 영문 소문자
@@ -82,10 +91,17 @@ claude
 /verify-resume
 /review-resume
 /refine-resume
+/final-check
 /pdf-resume
+
+# (선택) 포트폴리오 첨부를 요구할 때
+/portfolio
 
 # (선택) 면접 준비 — STAR 스토리 뱅크 생성
 /story-bank
+
+# 면접을 본 뒤 — 녹취를 넣으면 복기 리포트 + 회차 누적
+/interview-debrief {녹취 파일 경로}
 ```
 
 각 커맨드를 실행하면 Claude가 자동으로 파일을 읽고 결과물을 `outcome/` 하위 폴더에 저장합니다.
@@ -111,16 +127,26 @@ oh-my-career/
 │       ├── refine-resume/
 │       ├── final-check/
 │       ├── pdf-resume/
+│       ├── portfolio/
 │       ├── story-bank/
+│       ├── interview-debrief/
 │       └── dashboard/
 └── outcome/
-    ├── 0_evaluate/           # JD 적합도 평가 리포트
-    ├── 1_draft/              # 초안 3가지 (A/B/C 버전)
-    ├── 2_verify/             # 팩트 검증 + JD 정합성 리포트
-    ├── 3_review/             # 품질 리뷰 리포트
-    ├── 4_refine/             # 마크다운 최종본
-    ├── 5_pdf/                # HTML + PDF 제출본
-    └── interview/            # STAR 스토리 뱅크 + 회사별 면접 준비
+    ├── {company}/            # 회사(=JD)별 패키지 — 모든 단계 산출물이 이 안에 모임
+    │   ├── 0_evaluate/       # JD 적합도 평가 리포트
+    │   ├── 1_draft/          # 초안 3가지 (A/B/C 버전)
+    │   ├── 2_verify/         # 팩트 검증 + JD 정합성 리포트
+    │   ├── 3_review/         # 품질 리뷰 리포트
+    │   ├── 4_refine/         # 마크다운 최종본
+    │   ├── 5_pdf/            # HTML + PDF 제출본
+    │   ├── 6_portfolio/      # 딥다이브 포트폴리오 (선택)
+    │   └── interview/        # 회사별 면접 준비 + 복기 리포트·녹취
+    └── interview/            # 회사 공통 자산 (최상위 유지)
+        ├── story-bank.md         # STAR+R 스토리 뱅크
+        ├── debrief-index.md      # 면접 복기 회차 누적 + 반복 지적 추적
+        ├── question-bank.md      # 실제로 받은 질문 은행
+        ├── whiteboard-3frames.md # 화이트보드 3프레임 (AS-IS/선택지/TO-BE)
+        └── cdc-pipeline-script.md # 스토리별 답변 대본 (회사 무관)
 ```
 
 ---
@@ -128,29 +154,34 @@ oh-my-career/
 ## 📝 파일 명명 규칙
 
 ```
-outcome/0_evaluate/{company}-evaluate.md
-outcome/1_draft/{company}-draft-{A|B|C}.md
-outcome/2_verify/{company}-verify.md
-outcome/3_review/{company}-review.md
-outcome/4_refine/{company}-final.md
-outcome/4_refine/{company}-final-check.md
-outcome/5_pdf/{company}-final.html
-outcome/5_pdf/{company}-final.pdf
+outcome/{company}/0_evaluate/{company}-evaluate.md
+outcome/{company}/1_draft/{company}-draft-{A|B|C}.md
+outcome/{company}/2_verify/{company}-verify.md
+outcome/{company}/3_review/{company}-review.md
+outcome/{company}/4_refine/{company}-final.md
+outcome/{company}/4_refine/{company}-final-check.md
+outcome/{company}/5_pdf/{company}-final.html
+outcome/{company}/5_pdf/{company}-final.pdf
+outcome/{company}/6_portfolio/{company}-portfolio.html
+outcome/{company}/interview/{company}-interview.md
+outcome/{company}/interview/{company}-debrief-{N}차.md
+outcome/{company}/interview/raw/{company}-{N}차-녹취.md
 outcome/interview/story-bank.md
-outcome/interview/{company}-interview.md
+outcome/interview/debrief-index.md
+outcome/interview/question-bank.md
 ```
 
 **예시** (피치페이 지원 시):
 ```
-src/peachpay-jd.md
-outcome/1_draft/peachpay-draft-A.md
-outcome/1_draft/peachpay-draft-B.md
-outcome/1_draft/peachpay-draft-C.md
-outcome/2_verify/peachpay-verify.md
-outcome/3_review/peachpay-review.md
-outcome/4_refine/peachpay-final.md
-outcome/5_pdf/peachpay-final.html
-outcome/5_pdf/peachpay-final.pdf
+src/pending/peachpay_jd.md
+outcome/peachpay/1_draft/peachpay-draft-A.md
+outcome/peachpay/1_draft/peachpay-draft-B.md
+outcome/peachpay/1_draft/peachpay-draft-C.md
+outcome/peachpay/2_verify/peachpay-verify.md
+outcome/peachpay/3_review/peachpay-review.md
+outcome/peachpay/4_refine/peachpay-final.md
+outcome/peachpay/5_pdf/peachpay-final.html
+outcome/peachpay/5_pdf/peachpay-final.pdf
 ```
 
 ---
@@ -227,6 +258,22 @@ JD와 원본 이력서를 대조해 **10차원 가중 스코어링**으로 A-F �
 
 > 👀 **검토 포인트**: 생성된 PDF를 열어 페이지 잘림, 폰트, 여백, 사진 위치를 눈으로 확인하세요. 필요 시 HTML 파일을 직접 수정한 뒤 PDF를 재생성하면 됩니다.
 
+### 5.5 `/portfolio` — 딥다이브 포트폴리오 (선택)
+
+지원 폼이 경력기술서와 **별도로 "포트폴리오 첨부"를 요구할 때만** 씁니다.
+
+```
+/portfolio {company}
+```
+
+- **경력기술서 ≠ 포트폴리오**: 경력기술서가 *짧게·스캔·호기심 남기기*라면, 포트폴리오는 *깊게·보여주기·호기심 해소*
+- 대표 프로젝트 2-3개를 **아키텍처 다이어그램 + 설계 의사결정(왜) + 트러블슈팅 딥다이브 + 수치**로 풉니다
+- 산출물: `outcome/{company}/6_portfolio/{company}-portfolio.html` + `.pdf`
+
+> 👀 **검토 포인트**: 경력기술서와 문장을 재탕하면 실패입니다. 경력기술서에서 아낀 **메커니즘과 트레이드오프**가 여기 들어가야 합니다.
+
+---
+
 ### 6. `/story-bank` — 면접 STAR 스토리 뱅크 (선택)
 
 이력서의 경험들을 **STAR+R(Reflection) 구조**로 변환해 면접용 마스터 스토리를 축적합니다.
@@ -236,6 +283,22 @@ JD와 원본 이력서를 대조해 **10차원 가중 스코어링**으로 A-F �
 - 스토리 뱅크는 **누적 업데이트** — 이력서에 새 경험이 추가되면 자동으로 신규 스토리 append
 
 > 👀 **검토 포인트**: AI가 생성한 Reflection이 본인의 실제 배움과 다르다면 직접 수정하세요. 면접에서 자연스럽게 말할 수 있는 표현이어야 합니다.
+
+### 7. `/interview-debrief` — 면접 복기 (녹취 → 리포트)
+
+면접 **녹취 텍스트**를 넣으면 그 자리에 배석했던 **시니어 면접관 시각**으로 복기합니다. 목적은 위로가 아니라 다음 면접의 합격률입니다.
+
+```
+/interview-debrief outcome/{company}/interview/raw/{company}-1차-녹취.md
+```
+
+- **질문별 분석**: 유형·꼬리질문 깊이·면접관 반응까지 메타데이터로 분해 (꼬리질문 3단 이상 = 가장 강한 신호)
+- **🔴 사실 오류 + 이력서 대조**: `src/my-resume.md`와 대조해 **원본에 없는 수치·경험을 말했는지** 잡습니다
+- **면접관 힌트 채굴**: *"저희는 보통 ~하는데요"* 류 발화를 전부 뽑아냅니다 — 그 팀의 실제 스택과 기대 답안이 거기 있습니다
+- **⭐ 회차 누적**: `outcome/interview/debrief-index.md`에 회차·점수 추이를 쌓고, **2회 이상 반복된 지적은 자동으로 최우선 액션 아이템으로 승격**합니다 (`🔁 N회째`)
+- 받은 질문은 `question-bank.md`에 append — 회사가 달라도 질문은 반복됩니다
+
+> 👀 **검토 포인트**: 오디오만 있으면 먼저 텍스트로 변환하세요(클로바노트·다글로·MacWhisper). **화자 분리가 되면 정확도가 크게 올라갑니다.** 화자 분리가 없으면 문맥으로 추정하고, 추정 구간을 리포트에 표시합니다.
 
 ---
 
