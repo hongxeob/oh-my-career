@@ -97,7 +97,7 @@ APPLIED=$(dirname "$PENDING")/applied
 | 2.5 | `/cross-verify` | 독립 서브 에이전트 5개로 수치 귀속과 인용 금지 재검증 — 🛑 **BLOCK 시 게이트** |
 | 3 | `/review-resume` | 채용자 시각 품질 리뷰 (STAR 밀도, 표현) |
 | 4 | `/refine-resume` | 모든 피드백 통합 → 마크다운 최종본 |
-| 4.5 | `/final-check` | 채용자 시각 최종 검증 (JD 매칭, ATS) — 🛑 **'낮음' 시 게이트** |
+| 4.5 | `/final-check` | 채용자 시각 최종 검증 (JD 매칭, ATS) — 🛑 **게이트** |
 | 5 | `/pdf-resume` | MD 최종본 → HTML + PDF 변환 |
 | 6 | `/portfolio` | 딥다이브 포트폴리오 생성 (선택 — 포트폴리오 첨부 요구 시) |
 | - | `/story-bank` | STAR+R 스토리 뱅크 생성 + 회사별 면접 준비 |
@@ -110,9 +110,11 @@ APPLIED=$(dirname "$PENDING")/applied
 - 원본에 없는 숫자나 사실을 생성하지 않는다
 - 각 단계 결과물은 반드시 해당 `outcome/{company}/` 하위폴더에 저장한다(회사 단위 패키지 구조)
 - 단계를 건너뛰지 않는다 (draft → verify → cross-verify → review → refine → final-check → pdf 순서 준수)
-- **파이프라인은 자동으로 이어진다** — 사용자가 매 단계 커맨드를 치지 않는다. 멈추는 곳은 셋뿐이다:
-  ① `/evaluate-jd` 등급 판정(지원 여부는 사람이 정한다) ② `/cross-verify` **BLOCK** ③ `/final-check` **'낮음'**
-  그 외에는 묻지 말고 다음 스킬을 바로 실행하고, 끝나면 각 단계에서 무엇을 바꿨는지 한 번에 보고한다
+- **앞 구간만 자동으로 이어진다** — `draft → verify → cross-verify → review`는 **리포트만 내는 단계**라
+  사용자가 커맨드를 치지 않는다. `/review-resume`가 끝나면 누적 결과를 한 번에 보고하고 멈춘다.
+  **`/refine-resume`부터는 사용자가 직접 호출한다** — refine, final-check, pdf는 제출본 문장을 다시 쓰거나
+  제출본을 확정하는 단계다. **사고는 전부 이 뒤쪽 구간에서 났다**(오귀속, 게이트 우회, 게이트에서 떨어진
+  PDF가 "지원 완료"로 기록된 것). 앞 구간의 BLOCK(`/cross-verify`)과 등급 판정(`/evaluate-jd`)도 정지점이다
 - `/cross-verify` 리포트가 없거나 BLOCK이면 `/review-resume`가 시작을 거부한다 — 수치는 맞는데 **붙은 자리가 틀린** 사고를 여기서 막는다
 - JD는 `src/.my/jd/pending/`(미지원)에 두고 시작, `/pdf-resume` 완료 시 `src/.my/jd/applied/`로 자동 이동 — **이 이동을 건너뛰면 어디까지 지원했는지 파일 구조로 알 수 없게 된다** — `src/`, `outcome/` 전체는 gitignore 처리되어 있음 (개인정보 외부 노출 방지)
 
