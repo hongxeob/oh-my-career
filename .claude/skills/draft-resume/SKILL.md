@@ -19,10 +19,15 @@ description: Use when given an original resume/career data and a job description
 - JD: `{JD}` (`{company}_jd.md`)
 - **평가 리포트 (있으면 반드시)**: `outcome/{company}/0_evaluate/{company}-evaluate.md` — **두 섹션만** 읽는다
   ```bash
-  sed -n '/^## \(Step 1\. \)\?JD 핵심 요건/,/^## [^J]/p'   outcome/{company}/0_evaluate/{company}-evaluate.md
-  sed -n '/^## 이력서 커스터마이징 가이드/,/^## 예상 면접 질문/p' outcome/{company}/0_evaluate/{company}-evaluate.md
+  EV=outcome/{company}/0_evaluate/{company}-evaluate.md
+  REQ=$(sed -n '/^## .*JD 핵심 요건/,/^## [^J]/p' "$EV")
+  GUIDE=$(sed -n '/^## 이력서 커스터마이징 가이드/,/^## 예상 면접 질문/p' "$EV")
+  [ -n "$REQ" ]   || echo "❌ 평가 리포트에 「JD 핵심 요건」 섹션이 없다 — 헤딩이 바뀌었는지 확인하고, 이번 단계는 JD를 직접 분해한다"
+  [ -n "$GUIDE" ] || echo "❌ 평가 리포트에 「이력서 커스터마이징 가이드」 섹션이 없다"
   ```
-  리포트 전문은 50KB에 육박하는데 이 단계에 필요한 건 13KB다. 예상 면접 질문과 스코어카드는 `/story-bank` 몫이다
+  ⚠️ **`\(...\)\?` 같은 GNU 확장을 쓰지 않는다.** macOS의 BSD sed는 그것을 에러 없이 **0줄**로 흘려보낸다 —
+  빈 입력을 받고도 조용히 진행하게 되고, 그게 이 프로젝트가 반복해서 당한 실패 모드다. 그래서 위처럼 **비었으면 소리를 낸다.**
+  리포트 전문은 50KB에 육박했는데 이 단계에 필요한 건 두 섹션뿐이다. 예상 면접 질문과 스코어카드는 `/story-bank` 몫이다
 - 출력: `outcome/{company}/1_draft/{company}-draft-{A|B|C}.md`
 
 다른 파일을 쓰는 경우 사용자에게 경로를 확인하라.
