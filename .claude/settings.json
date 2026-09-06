@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"\nimport sys, json, shutil, os\ntry:\n    d = json.load(sys.stdin)\n    fp = d.get('tool_input', {}).get('file_path', '')\n    if fp.endswith('src/.my/my-resume.md'):\n        dest = os.environ.get('OMC_OBSIDIAN_RESUME', os.path.expanduser('~/Desktop/obsidian/resume/원본 이력서.md'))\\n        os.path.isdir(os.path.dirname(dest)) and shutil.copy(fp, dest)\n        print('\\033[32m[SYNC] src/.my/my-resume.md → Obsidian 원본 이력서.md 동기화 완료\\033[0m')\nexcept Exception as e:\n    print(f'[SYNC ERROR] {e}')\n\""
+            "command": "python3 -c \"\nimport sys, json, shutil, os\ntry:\n    d = json.load(sys.stdin)\n    fp = d.get('tool_input', {}).get('file_path', '')\n    # 디렉토리가 아니라 파일명으로 매칭한다 — 원본 위치는 옮겨질 수 있고,\n    # 전체 경로로 매칭하면 옮기는 순간 훅이 조용히 죽는다 (실제로 그렇게 죽어 있었다)\n    if os.path.basename(fp) == 'my-resume.md' and 'example' not in os.path.basename(fp):\n        dest = os.environ.get('OMC_OBSIDIAN_RESUME', os.path.expanduser('~/Desktop/obsidian/resume/원본 이력서.md'))\n        if os.path.isdir(os.path.dirname(dest)):\n            shutil.copy(fp, dest)\n            print('\\033[32m[SYNC] %s → %s\\033[0m' % (fp, dest))\nexcept Exception as e:\n    print(f'[SYNC ERROR] {e}')\n\""
           }
         ]
       }

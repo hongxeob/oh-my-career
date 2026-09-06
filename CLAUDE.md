@@ -60,6 +60,28 @@ outcome/interview/cdc-pipeline-script.md   (수기 — 생성 스킬 없음)
 
 예: 카카오스타일 → `outcome/kakao-style/1_draft/kakao-style-draft-A.md`, `outcome/kakao-style/2_verify/kakao-style-verify.md` ...
 
+## 경로 해석 (여기서만 정의한다)
+
+스킬은 아래 **이름**으로 파일을 가리킨다. 경로가 바뀌면 **이 표만 고친다.**
+
+| 이름 | 현재 경로 |
+|------|-----------|
+| `{RESUME}` | `src/.my/my-resume.md` |
+| `{JD}` | `src/.my/jd/pending/{company}_jd.md` (지원 완료 후 `src/.my/jd/applied/`) |
+
+⚠️ **스킬 파일에 경로를 하드코딩하지 않는다.** 예전에 12개 스킬이 각자 `src/my-resume.md`를 적어뒀는데,
+원본을 `src/.my/`로 옮기자 7개 스킬과 동기화 훅이 **한꺼번에 조용히 죽었다.** 파일을 못 읽어도 에러가 아니라
+"근거를 못 찾았다"는 판정으로 나와서, `/cross-verify`가 원본 없이 통과를 낼 수 있는 상태였다.
+
+표와 실제가 어긋났을 때 스킬이 스스로 찾는 방법:
+
+```bash
+find src -name 'my-resume.md' -not -name 'example*'    # 원본
+find src -name '*_jd.md' -not -name 'example*'         # JD
+```
+
+찾은 경로가 이 표와 다르면 **표를 고치고 진행한다.** 스킬 쪽을 고치지 않는다.
+
 ## 이력서 파이프라인
 
 | 순서 | 슬래시 커맨드 | 역할 |

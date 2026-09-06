@@ -12,9 +12,11 @@ description: Use when given an original resume/career data and a job description
 
 ## Input
 
+> 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
+
 **기본 경로** (oh-my-career 프로젝트):
-- 원본 이력서: `src/.my/my-resume.md`
-- JD: `src/.my/jd/pending/{company}_jd.md` (또는 `src/.my/jd/applied/`)
+- 원본 이력서: `{RESUME}` (= `src/.my/my-resume.md`)
+- JD: `{JD}` (= `src/.my/jd/pending/{company}_jd.md`) (또는 `src/.my/jd/applied/`)
 - **평가 리포트 (있으면 반드시)**: `outcome/{company}/0_evaluate/{company}-evaluate.md` — **두 섹션만** 읽는다
   ```bash
   sed -n '/^## Step 1\. JD 핵심 요건/,/^## Step 2\./p'      outcome/{company}/0_evaluate/{company}-evaluate.md

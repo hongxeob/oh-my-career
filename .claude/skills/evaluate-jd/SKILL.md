@@ -12,8 +12,10 @@ JD와 원본 이력서를 비교 분석해 **지원 적합도를 A-F 등급으�
 
 ## Input
 
-- 원본 이력서: `src/.my/my-resume.md`
-- JD: `src/.my/jd/pending/{company}_jd.md` (진행 중인 회사면 `src/.my/jd/applied/`에 있을 수도 있음)
+> 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
+
+- 원본 이력서: `{RESUME}` (= `src/.my/my-resume.md`)
+- JD: `{JD}` (= `src/.my/jd/pending/{company}_jd.md`) (진행 중인 회사면 `src/.my/jd/applied/`에 있을 수도 있음)
 
 ## Output
 

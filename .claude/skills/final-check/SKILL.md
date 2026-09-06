@@ -12,7 +12,9 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 
 ## Input
 
-- JD: `src/.my/jd/pending/{company}_jd.md` (또는 `src/.my/jd/applied/`)
+> 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
+
+- JD: `{JD}` (= `src/.my/jd/pending/{company}_jd.md`) (또는 `src/.my/jd/applied/`)
 - 최종본: `outcome/{company}/4_refine/{company}-final.md`
 - 원본(팩트 기준): **필요한 두 블록만** — 전문 45KB 중 이 단계가 쓰는 건 4.8KB다
   ```bash
@@ -67,7 +69,7 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 ## Critical Rules
 
 - **일반론 금지** — "성과를 구체적으로 쓰세요" 같은 조언 대신, 반드시 **이력서 원문 문장을 인용한 뒤 고친 문장**을 제시.
-- **팩트 유지** — 제안이 `src/.my/my-resume.md`에 없는 사실을 만들지 않는다. 원본에 없으면 "커버레터로 보완" 등 정직한 대안.
+- **팩트 유지** — 제안이 `{RESUME}` (= `src/.my/my-resume.md`)에 없는 사실을 만들지 않는다. 원본에 없으면 "커버레터로 보완" 등 정직한 대안.
 - **냉정하게** — 통과 가능성이 낮으면 낮다고 판정. 목적은 시간 낭비 방지.
 
 ## Output 형식

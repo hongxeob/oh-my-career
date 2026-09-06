@@ -12,9 +12,11 @@ description: Use when resume drafts have been created and need fact-checking aga
 
 ## Input
 
+> 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
+
 **기본 경로** (oh-my-career 프로젝트):
-- 원본 이력서: `src/.my/my-resume.md`
-- JD: `src/.my/jd/pending/{company}_jd.md` (또는 `src/.my/jd/applied/`)
+- 원본 이력서: `{RESUME}` (= `src/.my/my-resume.md`)
+- JD: `{JD}` (= `src/.my/jd/pending/{company}_jd.md`) (또는 `src/.my/jd/applied/`)
 - 검증 대상: `outcome/{company}/1_draft/{company}-draft-*.md`
 - 출력: `outcome/{company}/2_verify/{company}-verify.md`
 
@@ -23,7 +25,7 @@ description: Use when resume drafts have been created and need fact-checking aga
 ### Step 1: 파일 로드
 
 ```
-Read: src/.my/my-resume.md                        ← 팩트 기준
+Read: {RESUME}                                 ← 팩트 기준 (= src/.my/my-resume.md)
 Read: src/.my/jd/pending/{company}_jd.md              ← JD 기준
 Glob: outcome/{company}/1_draft/{company}-draft-*.md   ← 검증할 초안들 (디렉토리를 Read하면 실패한다)
 ```
@@ -105,6 +107,9 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 
 ## Critical Rules
 
+- **원본을 못 읽으면 리포트를 내지 않는다** — 대조 기준이 없으면 모든 항목이 ✅로 나오고, 그건 검증이 아니라
+  검증한 척이다. 파일을 못 찾으면 중단하고 사용자에게 알린다.
+  경로가 CLAUDE.md 「경로 해석」 표와 다르면 스킬이 아니라 **그 표를 고친다**
 - ❌ FAIL 항목은 반드시 삭제 — 검증자가 임의로 수정하지 않는다
 - 원본 이력서에 없는 내용을 "있을 것 같다"고 추정하지 않는다
 - 경력 연수 계산: 날짜 기준으로 정확히 계산한다

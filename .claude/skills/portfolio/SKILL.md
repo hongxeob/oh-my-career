@@ -16,9 +16,11 @@ description: Use when a résumé is finalized and the application also asks for 
 
 ## Input
 
-- 팩트 기준: `src/.my/my-resume.md`
+> 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
+
+- 팩트 기준: `{RESUME}` (= `src/.my/my-resume.md`)
 - 강조점 파악: `outcome/{company}/4_refine/{company}-final.md`
-- 프로젝트 우선순위: `src/.my/jd/pending/{company}_jd.md` (또는 `src/.my/jd/applied/`) — JD에 중요한 프로젝트를 flagship으로
+- 프로젝트 우선순위: `{JD}` (= `src/.my/jd/pending/{company}_jd.md`) (또는 `src/.my/jd/applied/`) — JD에 중요한 프로젝트를 flagship으로
 - 선택: instruction/ 이미지·배경 자료 (있으면 문제 정의에 반영, 단 PDF엔 외부 이미지 임베드 금지 — §Critical 참조)
 
 ## Output
