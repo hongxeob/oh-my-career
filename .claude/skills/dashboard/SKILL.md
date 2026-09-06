@@ -113,7 +113,7 @@ pdf 없음             → /pdf-resume {company}
 PDF가 있는데 JD가 아직 `pending/`에 있으면 **여기서 옮기고 화면에 표시한다.**
 
 ```bash
-ls src/.my/jd/pending/ src/.my/jd/applied/
+find src -type d -name pending -o -type d -name applied | while read d; do echo "[$d]"; ls "$d"; done
 ```
 
 `/pdf-resume` Step 5가 이 이동을 하지만, 파일명 표기가 어긋나 건너뛴 적이 있다(2026-09). 대시보드는 어차피

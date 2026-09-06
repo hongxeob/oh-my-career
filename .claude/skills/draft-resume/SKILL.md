@@ -15,8 +15,8 @@ description: Use when given an original resume/career data and a job description
 > 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
 
 **기본 경로** (oh-my-career 프로젝트):
-- 원본 이력서: `{RESUME}` (= `src/.my/my-resume.md`)
-- JD: `{JD}` (= `src/.my/jd/pending/{company}_jd.md`) (또는 `src/.my/jd/applied/`)
+- 원본 이력서: `{RESUME}`
+- JD: `{JD}`
 - **평가 리포트 (있으면 반드시)**: `outcome/{company}/0_evaluate/{company}-evaluate.md` — **두 섹션만** 읽는다
   ```bash
   sed -n '/^## Step 1\. JD 핵심 요건/,/^## Step 2\./p'      outcome/{company}/0_evaluate/{company}-evaluate.md
@@ -65,7 +65,7 @@ description: Use when given an original resume/career data and a job description
 - **원문 그대로 옮긴다.** 여기서 요약하거나 수치를 다듬으면 세 버전이 전부 그 왜곡 위에 서고,
   `/verify-resume`와 `/cross-verify`가 잡아야 할 오귀속을 이 단계가 만들어 넣는 셈이 된다
 - 원본 상단 **⚠️ 수치 귀속표와 🚫 인용 금지 목록을 팩트 블록에 함께 넣는다**
-  (`sed -n '16,81p' src/.my/my-resume.md`). 세 에이전트 모두 어느 수치가 어느 프로젝트 것인지,
+  (`{RESUME}`의 상단 세 블록 — 줄 번호는 `grep`으로 찾는다). 세 에이전트 모두 어느 수치가 어느 프로젝트 것인지,
   무엇을 쓰면 안 되는지 알아야 한다 — 나중에 잡는 것보다 안 만드는 게 싸다
 
 ### Step 3: 세 버전을 서브 에이전트로 **동시에** 생성한다

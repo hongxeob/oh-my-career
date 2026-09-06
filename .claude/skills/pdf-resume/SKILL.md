@@ -130,9 +130,11 @@ Chrome이 없어 스크립트가 멈추면 스크립트가 출력하는 설치 �
 PDF 생성 확인 후 JD를 `applied/`로 옮긴다.
 
 ```bash
-mkdir -p src/.my/jd/applied
-ls src/.my/jd/pending/          # 먼저 실제 파일명을 본다
-mv src/.my/jd/pending/<실제파일명> src/.my/jd/applied/
+PENDING=$(find src -type d -name pending | head -1)      # 경로는 바뀐다. 디렉토리 이름으로 찾는다
+APPLIED=$(dirname "$PENDING")/applied
+mkdir -p "$APPLIED"
+ls "$PENDING"                                            # 먼저 실제 파일명을 본다
+mv "$PENDING/<실제파일명>" "$APPLIED/"
 ```
 
 ⚠️ **`{company}*_jd.md` 글롭에 의존하지 않는다.** 회사 폴더명과 JD 파일명이 다른 표기를 쓴다:
@@ -160,11 +162,11 @@ mv src/.my/jd/pending/<실제파일명> src/.my/jd/applied/
 ```
 ✅ HTML 저장 완료 → outcome/{company}/5_pdf/{company}-final.html
 ✅ PDF 생성 완료 → outcome/{company}/5_pdf/{company}-final.pdf ({N}페이지)
-{JD를 옮겼으면}  ✅ JD 이동 완료 → src/.my/jd/pending/{company}_jd.md → src/.my/jd/applied/{company}_jd.md
-{옮길 게 없었으면} ⏭️ JD 이동 생략 — src/.my/jd/pending/에 해당 JD 없음
+{JD를 옮겼으면}  ✅ JD 이동 완료 → pending/{실제 파일명} → applied/{실제 파일명}
+{옮길 게 없었으면} ⏭️ JD 이동 생략 — pending/에 해당 JD 없음 (이미 applied면 성공으로 친다)
 
 이력서 파이프라인 완료:
-  src/.my/my-resume.md + src/.my/jd/applied/{company}_jd.md
+  {RESUME} + {JD}
   → outcome/{company}/0_evaluate/ (JD 적합도)
   → outcome/{company}/1_draft/    (초안 3가지)
   → outcome/{company}/2_verify/   (팩트/JD 검증 + 교차검증)

@@ -18,9 +18,9 @@ description: Use when a résumé is finalized and the application also asks for 
 
 > 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
 
-- 팩트 기준: `{RESUME}` (= `src/.my/my-resume.md`)
+- 팩트 기준: `{RESUME}`
 - 강조점 파악: `outcome/{company}/4_refine/{company}-final.md`
-- 프로젝트 우선순위: `{JD}` (= `src/.my/jd/pending/{company}_jd.md`) (또는 `src/.my/jd/applied/`) — JD에 중요한 프로젝트를 flagship으로
+- 프로젝트 우선순위: `{JD}`  — JD에 중요한 프로젝트를 flagship으로
 - 선택: instruction/ 이미지·배경 자료 (있으면 문제 정의에 반영, 단 PDF엔 외부 이미지 임베드 금지 — §Critical 참조)
 
 ## Output
@@ -41,7 +41,7 @@ description: Use when a résumé is finalized and the application also asks for 
 
 ### Step 1: 로드 및 flagship 선정
 ```
-Read: src/.my/my-resume.md, outcome/{company}/4_refine/{company}-final.md, src/.my/jd/pending/{company}_jd.md
+Read: {RESUME}, outcome/{company}/4_refine/{company}-final.md, {JD}
 ```
 JD 핵심 요구와 최상위로 매칭되는 프로젝트 2~3개 선정. 각 프로젝트에 원본에서 쓸 수 있는
 `문제 / 설계결정 / 트러블슈팅 / 수치` 재료가 충분한지 확인 (부족하면 다른 프로젝트로 교체).
