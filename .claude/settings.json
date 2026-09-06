@@ -2,11 +2,11 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "^(Edit|Write|MultiEdit)$",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"\nimport sys, json, shutil, os\ntry:\n    d = json.load(sys.stdin)\n    fp = d.get('tool_input', {}).get('file_path', '')\n    # 디렉토리가 아니라 파일명으로 매칭한다 — 원본 위치는 옮겨질 수 있고,\n    # 전체 경로로 매칭하면 옮기는 순간 훅이 조용히 죽는다 (실제로 그렇게 죽어 있었다)\n    if os.path.basename(fp) == 'my-resume.md' and 'example' not in os.path.basename(fp):\n        dest = os.environ.get('OMC_OBSIDIAN_RESUME', os.path.expanduser('~/Desktop/obsidian/resume/원본 이력서.md'))\n        if os.path.isdir(os.path.dirname(dest)):\n            shutil.copy(fp, dest)\n            print('\\033[32m[SYNC] %s → %s\\033[0m' % (fp, dest))\nexcept Exception as e:\n    print(f'[SYNC ERROR] {e}')\n\""
+            "command": "python3 -c \"\nimport sys, json, os, shutil, time\ntry:\n    d = json.load(sys.stdin)\n    fp = os.path.realpath(d.get('tool_input', {}).get('file_path', ''))\n    # basename만 보면 어디에 있는 my-resume.md든 볼트를 덮어쓴다.\n    # 경로 접미사로 제한한다 — 디렉토리 이동은 견디되 아무 파일이나 잡지는 않는다.\n    if not fp.endswith(os.sep + os.path.join('.my', 'my-resume.md')):\n        raise SystemExit\n    dest = os.environ.get('OMC_OBSIDIAN_RESUME', os.path.expanduser('~/Desktop/obsidian/resume/원본 이력서.md'))\n    if not os.path.isdir(os.path.dirname(dest)):\n        raise SystemExit\n    if os.path.exists(dest):\n        bak = dest + '.bak-' + time.strftime('%Y%m%d-%H%M%S')\n        shutil.copy2(dest, bak)   # 덮기 전 백업 — 조용한 손실을 막는다\n        print('\\033[90m[SYNC] 백업 %s\\033[0m' % os.path.basename(bak))\n    shutil.copy(fp, dest)\n    print('\\033[32m[SYNC] %s → %s\\033[0m' % (fp, dest))\nexcept SystemExit:\n    pass\nexcept Exception as e:\n    print('[SYNC ERROR] %s' % e)\n\""
           }
         ]
       }

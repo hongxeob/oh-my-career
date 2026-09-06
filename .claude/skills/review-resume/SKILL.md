@@ -27,9 +27,13 @@ description: Use when resume drafts have been verified and need deep quality rev
    ❌ outcome/{company}/2_verify/{company}-cross-verify.md 가 없습니다.
       2.5단계를 건너뛰었습니다. /cross-verify 를 먼저 실행하세요.
 
-2) 리포트의 게이트가 BLOCK이다
-   ❌ 교차검증 게이트: BLOCK ({오귀속 N건, 근거없음 M건})
-      지적 목록을 초안에 반영하고 /cross-verify 를 재실행하세요.
+2) `^GATE:` 줄이 PASS가 아니다
+   ❌ 교차검증 게이트가 PASS가 아닙니다.
+      검증했던 파일을 직접 고치고 /cross-verify 를 재실행하세요.
+      (`/refine-resume`를 태우지 않는다 — 이 시점엔 3_review 리포트가 없어 refine이 읽을 것이 없다)
+
+3) 리포트의 `검증 대상:` 줄이 이번 리뷰 대상과 다르다
+   ❌ 문서 X에 대한 PASS로 문서 Y를 리뷰할 수 없습니다.
 ```
 
 **"이번엔 수치가 단순해서 괜찮다"는 판단으로 넘기지 않는다.** 실제 사고는 전부 그 판단에서 났다.
@@ -89,7 +93,7 @@ STAR 밀도:
 
 ### Step 5: 전체 구조 리뷰
 
-- **길이**: 적정 분량인가 (1~2페이지 기준)
+- **길이**: 대략 1-2페이지 규모인가 (**마크다운 기준 추정**. 실제 페이지 수는 /pdf-resume 가 실측한다)
 - **밀도**: 정보가 균형있게 분배됐는가
 - **우선순위**: 중요한 내용이 앞에 오는가
 - **가독성**: 채용자가 30초 안에 핵심을 파악할 수 있는가

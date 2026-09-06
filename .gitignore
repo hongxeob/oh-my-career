@@ -29,3 +29,14 @@ outcome/
 
 # 개인정보 영역 — 절대 추적 금지 (숨김 디렉토리라 상위 규칙에 안 걸림)
 src/.my/
+
+# 심층 방어 — 리졸버가 `find src -name ...`로 위치 이동을 허용하므로
+# ignore도 같은 넓이여야 한다. src/.my/ 한 줄만 막으면 원본을 옮기는 순간
+# 스킬은 계속 동작하는데 실제 이력서가 추적 대상이 된다.
+src/**/my-resume.md
+src/**/pending/
+src/**/applied/
+/pending/
+/applied/
+!src/example-my-resume.md
+!src/example-jd.md

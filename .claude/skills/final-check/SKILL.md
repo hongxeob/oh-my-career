@@ -18,8 +18,9 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 - 최종본: `outcome/{company}/4_refine/{company}-final.md`
 - 원본(팩트 기준): **필요한 두 블록만** — 전문 45KB 중 이 단계가 쓰는 건 4.8KB다
   ```bash
-  RESUME=$(find src -name 'my-resume.md' -not -name 'example*' | head -1)   # 디렉토리는 바뀐다. 파일명으로 찾는다
-  grep -n '수치 귀속표\|인용 금지 목록' "$RESUME"   # 실제 줄 번호를 먼저 찾는다
+  RESUME=$(find src -name 'my-resume.md' -not -path '*example*' | head -1)
+  [ -n "$RESUME" ] || { echo "❌ 팩트 원본을 찾을 수 없다. 중단한다."; exit 1; }   # 디렉토리는 바뀐다. 파일명으로 찾는다
+  grep -n '수치 귀속표\|시스템 경계\|인용 금지 목록' "$RESUME"   # 실제 줄 번호를 먼저 찾는다
   sed -n '<찾은 범위>p' "$RESUME"
   ```
   개별 사실의 근거가 필요하면 그때 `grep -n` 으로 그 줄만 본다
@@ -54,6 +55,24 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 
 너는 15년 경력의 시니어 채용 담당자 겸 이력서 컨설턴트다. 이력서를 JD와 대조하여 최종 검토하되, 지원자에게 유리하게 포장하지 말고 실제로 서류 통과 확률을 높이는 데만 집중해 냉정하게 평가하라.
 
+
+### 🚫 교차검증 게이트 (모든 하류 노드가 각자 검사한다)
+
+```bash
+CV=outcome/{company}/2_verify/{company}-cross-verify.md
+[ -f "$CV" ] || { echo "❌ 교차검증 리포트가 없다. /cross-verify 를 먼저 실행하라."; exit 1; }
+grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
+```
+
+`GATE: PASS`가 아니면 **중단하고 사용자에게 보고한다.**
+
+⚠️ **게이트를 `review-resume` 한 곳에만 두지 않는다.** 예전에 그랬는데, BLOCK 복구 경로(사용자가 "고쳐줘"라고
+답한 뒤)가 하필 그 노드를 지나가지 않아서 **review와 cross-verify를 둘 다 건너뛰고 제출본이 나올 수 있었다.**
+사용자의 "진행"은 *고치라는 동의*였지 *제출하라는 동의*가 아니다. 게이트는 하류 전 노드가 각자 검사한다.
+
+⚠️ **`grep BLOCK`으로 판정하지 마라.** 리포트 본문에 회차 이력(`1차 BLOCK → 3차 PASS`)이 적히면 통과한
+문서를 거부하거나 그 반대가 된다. **`^GATE:` 줄 하나만** 본다.
+
 ## Process (검토 항목)
 
 `[고유]` = 이 스킬이 새로 판정. `[확인]` = review-resume가 이미 판정했으므로 **반영 여부만** 확인(리뷰 리포트가 없을 때만 새로 판정).
@@ -68,11 +87,32 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 8. `[고유]` **표현과 문법, 톤 일관성**: `house-style.md`(같은 디렉토리)를 읽고 **Tier 1 + Tier 2 전 항목**을 대조한다. 위반이 잡히면 "3. 우선순위 수정 리스트"에 원문/고친 문장을 함께 제시한다 — 별도 윤문 스킬에 의존하지 않고 이 스킬이 직접 고친 문장을 만든다.
 9. `[고유]` **차별화 요소**: 동일 직무 타 후보 대비 차별점이 드러나는지. 안 드러나면 어느 경력을 앞세울지 제안.
 
+### Step 10: 수정 반영과 재검증 (리포트 저장보다 먼저)
+
+**리포트를 저장하기 전에 여기까지 끝낸다.** 예전엔 "완료" 표시가 수정보다 앞에 와서, 여기서 중단되면
+리포트만 남고 수정이 통째로 날아갔다. 그런데 대시보드는 리포트 존재만 보고 완료로 친다.
+
+1. 우선순위 수정 리스트를 `outcome/{company}/4_refine/{company}-final.md`에 반영한다
+2. **고친 문장에 숫자가 하나라도 들어 있으면 `/cross-verify`를 재실행한다** (대상: `4_refine/{company}-final.md`)
+
+   🚨 **이게 파이프라인에서 제일 위험한 자리다.** 오귀속 게이트는 2.5단계에서 **초안**에 대해 돌았고,
+   그 뒤 refine이 문장을 재작성했고, 여기서 또 재작성한다. **오귀속 검사 뒤에 문장을 다시 쓰는 노드는
+   여기가 마지막인데 그 뒤에 검사가 없었다.** 게다가 이 스킬은 원본의 시스템 경계 블록을 읽지 않으므로
+   "값이 맞으니 괜찮다"는 판단밖에 못 한다 — 실제 사고가 정확히 그 판단에서 났다.
+
+3. 반영분을 `outcome/{company}/4_refine/{company}-changelog.md`에 기록한다
+   (`| 항목 | 변경 전 | 변경 후 | 근거: final-check |`)
+4. **자동 반영한 수정 목록을 사용자에게 먼저 출력한다.** pdf를 뽑고 나서 알리면 "제출본이 조용히 바뀌면
+   안 된다"는 원칙이 사후 통지가 된다
+5. 그다음 리포트를 저장하고 `/pdf-resume`로 넘어간다
+
 ## Critical Rules
 
 - **일반론 금지** — "성과를 구체적으로 쓰세요" 같은 조언 대신, 반드시 **이력서 원문 문장을 인용한 뒤 고친 문장**을 제시.
 - **팩트 유지** — 제안이 `{RESUME}` (`my-resume.md`)에 없는 사실을 만들지 않는다. 원본에 없으면 "커버레터로 보완" 등 정직한 대안.
 - **냉정하게** — 통과 가능성이 낮으면 낮다고 판정. 목적은 시간 낭비 방지.
+- **changelog 기록은 필수다** — 권고가 아니다. 기록이 없으면 refine 재실행 때 여기서 반영한 수정이 사라진다.
+- **수정 후 리포트 저장** — 순서를 바꾸지 않는다 (Step 10 참조).
 
 ## Output 형식
 
@@ -104,11 +144,7 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 ```
 ✅ 최종 검토 완료 → outcome/{company}/4_refine/{company}-final-check.md
 
-'높음' 또는 '보통':
-  1. 우선순위 수정 리스트를 outcome/{company}/4_refine/{company}-final.md에 직접 반영
-  2. **무엇을 고쳤는지 changelog에 기록한다** (아래 참조)
-  3. ▶ **이어서 /pdf-resume 를 바로 실행한다.** 사용자에게 묻지 않는다
-  4. 보고할 때 **자동 반영한 수정 목록을 함께 낸다** — 제출본이 조용히 바뀌면 안 된다
+'높음' 또는 '보통': **Step 10을 마친 뒤** ▶ /pdf-resume 로 이어진다 (아래 Process 참조)
 
 '낮음':
   🛑 **여기서 멈춘다.** 수정 리스트와 판정 근거를 보고하고 답을 기다린다.

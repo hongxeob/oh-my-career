@@ -21,6 +21,24 @@ description: Use when a finalized resume markdown exists and needs to be convert
 - `outcome/{company}/5_pdf/{company}-final.html`
 - `outcome/{company}/5_pdf/{company}-final.pdf`
 
+
+### 🚫 교차검증 게이트 (모든 하류 노드가 각자 검사한다)
+
+```bash
+CV=outcome/{company}/2_verify/{company}-cross-verify.md
+[ -f "$CV" ] || { echo "❌ 교차검증 리포트가 없다. /cross-verify 를 먼저 실행하라."; exit 1; }
+grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
+```
+
+`GATE: PASS`가 아니면 **중단하고 사용자에게 보고한다.**
+
+⚠️ **게이트를 `review-resume` 한 곳에만 두지 않는다.** 예전에 그랬는데, BLOCK 복구 경로(사용자가 "고쳐줘"라고
+답한 뒤)가 하필 그 노드를 지나가지 않아서 **review와 cross-verify를 둘 다 건너뛰고 제출본이 나올 수 있었다.**
+사용자의 "진행"은 *고치라는 동의*였지 *제출하라는 동의*가 아니다. 게이트는 하류 전 노드가 각자 검사한다.
+
+⚠️ **`grep BLOCK`으로 판정하지 마라.** 리포트 본문에 회차 이력(`1차 BLOCK → 3차 PASS`)이 적히면 통과한
+문서를 거부하거나 그 반대가 된다. **`^GATE:` 줄 하나만** 본다.
+
 ## Process
 
 ### Step 1: 파일 로드 및 회사명 감지
@@ -113,6 +131,7 @@ HTML 저장 후 공용 스크립트 한 번으로 렌더와 검사를 끝낸다.
 bash .claude/skills/_shared/render-pdf.sh \
   outcome/{company}/5_pdf/{company}-final.html \
   outcome/{company}/5_pdf/{company}-final.pdf 2
+echo "rc=$?"   # 0=통과  2=분량 게이트 실패  3=환경 오류
 ```
 
 **렌더 전 분량 예산** — 렌더해봐야 페이지 수를 아는 왕복을 줄인다. 템플릿 CSS가 고정이라 바이트와 페이지가
@@ -131,6 +150,9 @@ PDF 생성 확인 후 JD를 `applied/`로 옮긴다.
 
 ```bash
 PENDING=$(find src -type d -name pending | head -1)      # 경로는 바뀐다. 디렉토리 이름으로 찾는다
+# 가드 없이 진행하면 dirname "" = "." 이라 리포 루트에 applied/ 를 만들고
+# mv 소스가 "/파일명" (파일시스템 루트)이 된다. 게다가 mkdir 은 exit 0 이라 조용하다.
+[ -n "$PENDING" ] && [ -d "$PENDING" ] || { echo "❌ pending 디렉토리를 찾을 수 없다. 중단한다."; exit 1; }
 APPLIED=$(dirname "$PENDING")/applied
 mkdir -p "$APPLIED"
 ls "$PENDING"                                            # 먼저 실제 파일명을 본다
@@ -144,6 +166,10 @@ mv "$PENDING/<실제파일명>" "$APPLIED/"
 
 **이미 `applied/`에 있으면 성공으로 간주하고 넘어간다** (재실행 안전). PDF만 다시 뽑을 때 이 단계가 실패로
 보이면 안 된다.
+
+🚫 **Step 4가 rc=0이 아니면 이 단계를 실행하지 않는다.** 렌더 스크립트는 실패 시 PDF를 지우지만,
+이 이동은 파일시스템에 남는 유일한 "지원함" 신호이고 되돌리는 절차가 없다. 게이트에서 떨어진 문서를
+"지원 완료"로 기록하지 않는다.
 
 **JD가 pending/에 없으면 건너뛰지 말고 어디 있는지 찾아 옮긴다.** 이 이동이 "지원함 / 안 함"을 구분하는
 유일한 장치다. 실제로 경로가 어긋났다는 이유로 이 단계를 건너뛴 적이 있고(2026-09), 그 결과 어디까지

@@ -41,7 +41,8 @@ src/.my/my-resume.md  +  src/.my/jd/pending/{company}_jd.md
   /refine-resume     →  outcome/{company}/4_refine/{company}-final.md
           │
           ▼
-  /final-check       →  outcome/{company}/4_refine/{company}-final-check.md  (채용자 시각 최종 게이트)
+  /final-check       →  outcome/{company}/4_refine/{company}-final-check.md
+outcome/{company}/4_refine/{company}-changelog.md  (채용자 시각 최종 게이트)
           │
           ▼
     /pdf-resume      →  outcome/{company}/5_pdf/{company}-final.html + .pdf
@@ -178,6 +179,7 @@ outcome/{company}/2_verify/{company}-cross-verify.md
 outcome/{company}/3_review/{company}-review.md
 outcome/{company}/4_refine/{company}-final.md
 outcome/{company}/4_refine/{company}-final-check.md
+outcome/{company}/4_refine/{company}-changelog.md
 outcome/{company}/5_pdf/{company}-final.html
 outcome/{company}/5_pdf/{company}-final.pdf
 outcome/{company}/6_portfolio/{company}-portfolio.html
@@ -375,7 +377,7 @@ file:///path/to/oh-my-career/dashboard.html
 - `src/.my/my-resume.md`는 팩트 기준 — **이 파일의 수치/사실을 절대 변형하지 않는다**
 - 원본에 없는 숫자나 사실을 생성하지 않는다
 - 각 단계 결과물은 반드시 해당 `outcome/` 하위폴더에 저장한다
-- **단계를 건너뛰지 않는다** (draft → verify → review → refine → pdf 순서 준수)
+- **단계를 건너뛰지 않는다** (draft → verify → **cross-verify** → review → refine → **final-check** → pdf 순서 준수)
 
 ---
 

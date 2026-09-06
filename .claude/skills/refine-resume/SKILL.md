@@ -19,15 +19,42 @@ description: Use when resume drafts have been reviewed and need final refinement
 - 리뷰: `outcome/{company}/3_review/{company}-review.md`
 - 출력: `outcome/{company}/4_refine/{company}-final.md`
 
+
+### 🚫 교차검증 게이트 (모든 하류 노드가 각자 검사한다)
+
+```bash
+CV=outcome/{company}/2_verify/{company}-cross-verify.md
+[ -f "$CV" ] || { echo "❌ 교차검증 리포트가 없다. /cross-verify 를 먼저 실행하라."; exit 1; }
+grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
+```
+
+`GATE: PASS`가 아니면 **중단하고 사용자에게 보고한다.**
+
+⚠️ **게이트를 `review-resume` 한 곳에만 두지 않는다.** 예전에 그랬는데, BLOCK 복구 경로(사용자가 "고쳐줘"라고
+답한 뒤)가 하필 그 노드를 지나가지 않아서 **review와 cross-verify를 둘 다 건너뛰고 제출본이 나올 수 있었다.**
+사용자의 "진행"은 *고치라는 동의*였지 *제출하라는 동의*가 아니다. 게이트는 하류 전 노드가 각자 검사한다.
+
+⚠️ **`grep BLOCK`으로 판정하지 마라.** 리포트 본문에 회차 이력(`1차 BLOCK → 3차 PASS`)이 적히면 통과한
+문서를 거부하거나 그 반대가 된다. **`^GATE:` 줄 하나만** 본다.
+
 ## Process
 
 ### Step 1: 파일 로드 및 수정 목록 통합
 
+한 번에 배치로 읽는다:
+
 ```
 Read: outcome/{company}/1_draft/{company}-draft-{추천버전}.md    ← 베이스
 Read: outcome/{company}/2_verify/{company}-verify.md             ← 필수 삭제/수정
+Read: outcome/{company}/2_verify/{company}-cross-verify.md       ← ❌ 오귀속 = Priority 0
 Read: outcome/{company}/3_review/{company}-review.md             ← 표현 개선
+Read: outcome/{company}/4_refine/{company}-changelog.md          ← 있으면 (아래)
 ```
+
+⚠️ **changelog를 반드시 읽는다.** `final-check`가 최종본을 직접 고치고 그 내역을 여기 남긴다.
+이 파일을 안 읽고 초안에서 다시 만들면 **그 수정이 통째로 사라진다.** 기록만 하고 읽지 않으면
+로그는 남고 문서는 사라진다 — 그건 방어가 아니다.
+**근거가 `final-check`인 행은 재적용한다.**
 
 수정 목록을 우선순위 순서로 통합:
 ```
@@ -86,7 +113,7 @@ review ❌ 항목 처리:
 [ ] 기술 스택이 JD 순서와 정렬됐는가
 [ ] 각 경력 항목에 회사 소개 블록쿼트와 회사별 기술 스택 줄이 있는가
 [ ] house-style.md Tier 1 위반이 없는가 (가운뎃점·em dash·물결표·피동형)
-[ ] 전체 2페이지 이내인가 (PDF 기준)
+[ ] 분량이 대략 2페이지 규모인가 (**추정**이다. 실측은 /pdf-resume 가 한다)
 ```
 
 ### Step 5: 최종본 저장

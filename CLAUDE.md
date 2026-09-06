@@ -72,7 +72,7 @@ outcome/interview/cdc-pipeline-script.md   (수기 — 생성 스킬 없음)
 **위치는 바뀐다. 안정적인 건 파일명과 디렉토리 이름뿐이다.** 그래서 스킬은 경로를 하드코딩하지 않고 찾는다:
 
 ```bash
-RESUME=$(find src -name 'my-resume.md' -not -name 'example*' | head -1)
+RESUME=$(find src -name 'my-resume.md' -not -path '*example*' | head -1)
 PENDING=$(find src -type d -name pending | head -1)
 APPLIED=$(dirname "$PENDING")/applied
 ```
