@@ -12,9 +12,12 @@ description: Use when the user wants to build or update their interview story ba
 
 ## Input
 
-- 원본 이력서: `src/my-resume.md`
-- JD (선택): `src/pending/{company}_jd.md` (또는 `src/applied/`) — 있으면 해당 JD 맞춤, 없으면 범용 스토리 뱅크 생성
-- 기존 평가 (선택): `outcome/{company}/0_evaluate/{company}-evaluate.md` — 있으면 예상 질문 활용
+- 원본 이력서: `src/.my/my-resume.md`
+- JD (선택): `src/.my/jd/pending/{company}_jd.md` (또는 `src/.my/jd/applied/`) — 있으면 해당 JD 맞춤, 없으면 범용 스토리 뱅크 생성
+- 기존 평가 (선택): 평가 리포트에서 **예상 질문 섹션만** 뽑는다. 리포트 전문은 49KB인데 필요한 건 6KB다
+  ```bash
+  sed -n '/^## 예상 면접 질문/,/^## /p' outcome/{company}/0_evaluate/{company}-evaluate.md
+  ```
 
 ## Output
 
@@ -25,7 +28,7 @@ description: Use when the user wants to build or update their interview story ba
 
 ### Step 1: 마스터 스토리 추출 (최초 실행 또는 업데이트 시)
 
-`src/my-resume.md`에서 성과 기반 경험을 추출해 STAR+R 구조로 변환:
+`src/.my/my-resume.md`에서 성과 기반 경험을 추출해 STAR+R 구조로 변환:
 
 ```markdown
 ### 스토리 #{번호}: {한줄 제목}
@@ -82,7 +85,7 @@ JD와 평가 리포트를 기반으로 예상 질문을 생성하고 마스터 �
 ### Step 3: 스토리 뱅크 누적 업데이트
 
 - `outcome/interview/story-bank.md`가 이미 존재하면 **기존 스토리를 유지**하고 신규 경험만 추가
-- 이력서(`src/my-resume.md`)에 새 경험이 추가됐으면 해당 경험을 새 스토리로 변환해 append
+- 이력서(`src/.my/my-resume.md`)에 새 경험이 추가됐으면 해당 경험을 새 스토리로 변환해 append
 - 스토리 번호는 순차 증가, 기존 번호는 변경하지 않음
 - 상단에 **스토리 인덱스 테이블** 유지:
 

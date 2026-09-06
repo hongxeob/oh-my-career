@@ -12,8 +12,8 @@ JD와 원본 이력서를 비교 분석해 **지원 적합도를 A-F 등급으�
 
 ## Input
 
-- 원본 이력서: `src/my-resume.md`
-- JD: `src/pending/{company}_jd.md` (진행 중인 회사면 `src/applied/`에 있을 수도 있음)
+- 원본 이력서: `src/.my/my-resume.md`
+- JD: `src/.my/jd/pending/{company}_jd.md` (진행 중인 회사면 `src/.my/jd/applied/`에 있을 수도 있음)
 
 ## Output
 
@@ -114,10 +114,14 @@ outcome/{company}/0_evaluate/{company}-evaluate.md
 ```
 ✅ JD 평가 완료 → outcome/{company}/0_evaluate/{company}-evaluate.md
 
-등급 B 이상이면:
-  → /draft-resume 로 맞춤 이력서 초안 생성
-  → 또는 기존 최종본을 커스터마이징 가이드 기반으로 수정
+🛑 **여기서 멈춘다. 자동으로 다음 단계를 실행하지 않는다.**
+   지원할지 말지는 사용자가 정한다. 등급과 갭 분석을 보고하고 답을 기다린다.
 
-등급 C 이하이면:
-  → 갭 분석을 참고해 지원 여부 재검토
+등급 B 이상 → 사용자가 진행을 원하면 /draft-resume
+등급 C 이하 → 갭 분석을 근거로 지원 비추천 의견을 함께 낸다
 ```
+
+> **이어달리기 규칙** — 파이프라인은 사용자가 매 단계 커맨드를 치지 않아도 이어진다.
+> 멈추는 곳은 셋뿐이다: ① `/evaluate-jd` 등급 판정 ② `/cross-verify` BLOCK ③ `/final-check` '낮음'.
+> 그 외에는 **묻지 말고 다음 스킬을 바로 실행한다.** 중간에 사용자가 끼어들면 그 지시가 우선한다.
+

@@ -13,8 +13,8 @@ description: Use when resume drafts have been created and need fact-checking aga
 ## Input
 
 **기본 경로** (oh-my-career 프로젝트):
-- 원본 이력서: `src/my-resume.md`
-- JD: `src/pending/{company}_jd.md` (또는 `src/applied/`)
+- 원본 이력서: `src/.my/my-resume.md`
+- JD: `src/.my/jd/pending/{company}_jd.md` (또는 `src/.my/jd/applied/`)
 - 검증 대상: `outcome/{company}/1_draft/{company}-draft-*.md`
 - 출력: `outcome/{company}/2_verify/{company}-verify.md`
 
@@ -23,9 +23,9 @@ description: Use when resume drafts have been created and need fact-checking aga
 ### Step 1: 파일 로드
 
 ```
-Read: src/my-resume.md                        ← 팩트 기준
-Read: src/pending/{company}_jd.md              ← JD 기준
-Read: outcome/{company}/1_draft/               ← 검증할 초안들
+Read: src/.my/my-resume.md                        ← 팩트 기준
+Read: src/.my/jd/pending/{company}_jd.md              ← JD 기준
+Glob: outcome/{company}/1_draft/{company}-draft-*.md   ← 검증할 초안들 (디렉토리를 Read하면 실패한다)
 ```
 
 ### Step 2: 팩트 검증
@@ -50,10 +50,9 @@ JD 필수/우대 요건 대비 초안 커버리지:
 
 | JD 요건 | 구분 | 초안 반영 여부 | 위치 |
 |---------|------|---------------|------|
-| Java/Kotlin + Spring | 필수 | ✅ 반영 | 스킬 섹션 |
-| 3년 이상 경력 | 필수 | ⚠️ 경력 계산 필요 | 헤더 |
-| OMS/WMS 경험 | 우대 | ❌ 미반영 | - |
-| AI Agent 활용 | 필수 | ⚠️ 약하게 언급 | 기타 기여 |
+| {JD에서 뽑은 요건} | 필수/우대 | ✅ 반영 / ⚠️ 약함 / ❌ 미반영 | {섹션} |
+
+⚠️ **예시 요건을 이 파일에 적어두지 않는다.** 다른 회사 JD가 박혀 있으면 그 요건을 찾는 쪽으로 판정이 끌려간다.
 
 ### Step 4: 버전별 전략 달성도
 
@@ -114,5 +113,11 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 
 ```
 ✅ 검증 리포트 저장 완료 → outcome/{company}/2_verify/
-→ 다음 단계: /review-resume 로 품질 리뷰 실행
+▶ **이어서 /cross-verify 를 바로 실행한다.** 사용자에게 묻지 않는다.
+   ❌ FAIL 항목이 있어도 멈추지 않는다 — 교차검증까지 돌려서 지적을 모아 한 번에 반영하는 편이 왕복이 적다.
 ```
+
+> **이어달리기 규칙** — 파이프라인은 사용자가 매 단계 커맨드를 치지 않아도 이어진다.
+> 멈추는 곳은 셋뿐이다: ① `/evaluate-jd` 등급 판정 ② `/cross-verify` BLOCK ③ `/final-check` '낮음'.
+> 그 외에는 **묻지 말고 다음 스킬을 바로 실행한다.** 중간에 사용자가 끼어들면 그 지시가 우선한다.
+

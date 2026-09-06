@@ -14,6 +14,25 @@ description: Use when resume drafts have been verified and need deep quality rev
 
 **기본 경로** (oh-my-career 프로젝트):
 - 검증 리포트: `outcome/{company}/2_verify/{company}-verify.md`
+- 교차검증 게이트: `head -8 outcome/{company}/2_verify/{company}-cross-verify.md` — **게이트 줄만 읽는다**
+  (지적 목록 전문이 필요한 건 `/refine-resume`이지 리뷰가 아니다. 전문을 읽으면 12KB를 0.4KB 대신 올린다)
+
+### 🚫 시작 전 중단 조건 (2.5단계 게이트)
+
+아래 둘 중 하나면 **리뷰를 시작하지 않고 즉시 중단**한다. 리뷰는 표현과 구조를 보는 단계라,
+수치가 엉뚱한 줄에 붙어 있어도 통과시킨다 — 그래서 이 게이트가 리뷰보다 앞에 있어야 한다.
+
+```
+1) cross-verify 리포트 파일이 없다
+   ❌ outcome/{company}/2_verify/{company}-cross-verify.md 가 없습니다.
+      2.5단계를 건너뛰었습니다. /cross-verify 를 먼저 실행하세요.
+
+2) 리포트의 게이트가 BLOCK이다
+   ❌ 교차검증 게이트: BLOCK ({오귀속 N건, 근거없음 M건})
+      지적 목록을 초안에 반영하고 /cross-verify 를 재실행하세요.
+```
+
+**"이번엔 수치가 단순해서 괜찮다"는 판단으로 넘기지 않는다.** 실제 사고는 전부 그 판단에서 났다.
 - 초안: `outcome/{company}/1_draft/{company}-draft-{추천버전}.md`
 - 출력: `outcome/{company}/3_review/{company}-review.md`
 
@@ -21,8 +40,11 @@ description: Use when resume drafts have been verified and need deep quality rev
 
 ### Step 1: 파일 로드
 
+한 번에 배치로 읽는다:
+
 ```
-Read: outcome/{company}/2_verify/{company}-verify.md    ← 추천 버전 확인
+head -8 outcome/{company}/2_verify/{company}-cross-verify.md   ← 게이트 PASS/BLOCK (먼저 확인)
+Read: outcome/{company}/2_verify/{company}-verify.md            ← 추천 버전 확인
 Read: outcome/{company}/1_draft/{company}-draft-{추천버전}.md
 ```
 
@@ -118,5 +140,11 @@ STAR 밀도:
 
 ```
 ✅ 리뷰 리포트 저장 완료 → outcome/{company}/3_review/
-→ 다음 단계: /refine-resume 로 최종 완성본 생성
+▶ **이어서 /refine-resume 를 바로 실행한다.** 사용자에게 묻지 않는다.
+   리뷰는 권고다 — 사용자 확인을 받으려고 멈추지 말고, 반영 결과를 refine 이후에 함께 보고한다.
 ```
+
+> **이어달리기 규칙** — 파이프라인은 사용자가 매 단계 커맨드를 치지 않아도 이어진다.
+> 멈추는 곳은 셋뿐이다: ① `/evaluate-jd` 등급 판정 ② `/cross-verify` BLOCK ③ `/final-check` '낮음'.
+> 그 외에는 **묻지 말고 다음 스킬을 바로 실행한다.** 중간에 사용자가 끼어들면 그 지시가 우선한다.
+

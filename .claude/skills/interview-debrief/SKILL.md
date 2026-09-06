@@ -15,8 +15,8 @@ description: Use when the user wants to review a past interview — real or mock
 ## Input
 
 - **녹취 텍스트** (필수) — 사용자가 붙여넣거나 파일 경로 제공
-- `src/my-resume.md` — 팩트 대조 기준 (**필수로 읽는다**)
-- `src/applied/{company}_jd.md` 또는 `src/pending/{company}_jd.md` — 평가 축 가중치
+- `src/.my/my-resume.md` — 팩트 대조 기준 (**필수로 읽는다**)
+- `src/.my/jd/applied/{company}_jd.md` 또는 `src/.my/jd/pending/{company}_jd.md` — 평가 축 가중치
 - `outcome/interview/debrief-index.md` — 이전 회차 누적 (있으면 반드시 읽는다)
 
 ## Output — 파일 3개
@@ -69,7 +69,7 @@ Q&A 블록으로 분해하고 각각에 메타데이터를 붙인다:
 
 ### Step 3. 🔴 이력서 대조 (프로젝트 고유 — 건너뛰지 말 것)
 
-`src/my-resume.md`를 읽고 녹취와 대조한다.
+`src/.my/my-resume.md`를 읽고 녹취와 대조한다.
 
 | 검사 | 판정 |
 |---|---|

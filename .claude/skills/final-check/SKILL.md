@@ -12,9 +12,13 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 
 ## Input
 
-- JD: `src/pending/{company}_jd.md` (또는 `src/applied/`)
+- JD: `src/.my/jd/pending/{company}_jd.md` (또는 `src/.my/jd/applied/`)
 - 최종본: `outcome/{company}/4_refine/{company}-final.md`
-- 원본(팩트 기준): `src/my-resume.md`
+- 원본(팩트 기준): **필요한 두 블록만** — 전문 45KB 중 이 단계가 쓰는 건 4.8KB다
+  ```bash
+  sed -n '16,48p;61,81p' src/.my/my-resume.md    # 수치 귀속표 + 인용 금지 목록
+  ```
+  개별 사실의 근거가 필요하면 그때 `grep -n` 으로 그 줄만 본다
 - 하우스 스타일: `.claude/skills/final-check/house-style.md`
 - 이전 리뷰: `outcome/{company}/3_review/{company}-review.md` (있으면 — 아래 중복 방지 규칙)
 
@@ -29,6 +33,14 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 2. ATS 키워드 통과 가능성
 3. 하우스 스타일 위반(`house-style.md`)
 4. 서류 통과 가능성 최종 판정(높음/보통/낮음)
+5. **기술 스택 순서** — `refine-resume` Step 3에서 JD 기준으로 재정렬한 결과를 **검증하는 스킬이 여기밖에 없다.**
+   review는 초안을 봤고, 순서를 바꾼 건 그 이후다. JD 필수 기술이 상단에 있는지, 실사용 경험 없는 기술이
+   섞였는지 확인한다
+6. **불필요·중복·리스크** — review에 대응 항목이 없다. 기준선이 없으므로 **새로 판정한다**
+
+⚠️ **리뷰 대상이 겹치면 이 경계가 무너진다.** 위 구분은 "review는 초안(`1_draft`)을, final-check는 최종본
+(`4_refine`)을 본다"는 전제에 얹혀 있다. review를 최종본에 다시 돌리면 같은 문서를 두 번 리뷰하는 것이 되어
+중복 방지 규칙이 오히려 검사 누락을 만든다. 그 경우 이 절의 `[확인]` 처리를 쓰지 말고 전 항목을 새로 판정한다.
 
 ## Output
 
@@ -49,13 +61,13 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 5. `[고유]` **커리어 서사 일관성**: 경력 이동·공백기·직무 전환 흐름이 논리적인지. 채용자가 의문 가질 지점(잦은 이직·무관 경력 등) 짚고 대응 문구 제안.
 6. `[확인]` **불필요·중복·리스크**: 직무 무관 정보, 중복 서술, 과장·애매한 책임 범위 표현. review 지적분 외 **새로 생긴 것만** 지적.
 7. `[확인]` **형식·분량·가독성**: 분량(2페이지 이내)과 섹션 순서 위주로. review와 겹치는 세부 문장 길이 재지적은 생략.
-8. `[고유]` **표현·문법·톤 일관성**: `house-style.md`(같은 디렉토리)를 읽고 **Tier 1 + Tier 2 전 항목**을 대조한다. 위반이 잡히면 "3. 우선순위 수정 리스트"에 원문/고친 문장을 함께 제시한다 — 별도 윤문 스킬에 의존하지 않고 이 스킬이 직접 고친 문장을 만든다.
+8. `[고유]` **표현과 문법, 톤 일관성**: `house-style.md`(같은 디렉토리)를 읽고 **Tier 1 + Tier 2 전 항목**을 대조한다. 위반이 잡히면 "3. 우선순위 수정 리스트"에 원문/고친 문장을 함께 제시한다 — 별도 윤문 스킬에 의존하지 않고 이 스킬이 직접 고친 문장을 만든다.
 9. `[고유]` **차별화 요소**: 동일 직무 타 후보 대비 차별점이 드러나는지. 안 드러나면 어느 경력을 앞세울지 제안.
 
 ## Critical Rules
 
 - **일반론 금지** — "성과를 구체적으로 쓰세요" 같은 조언 대신, 반드시 **이력서 원문 문장을 인용한 뒤 고친 문장**을 제시.
-- **팩트 유지** — 제안이 `src/my-resume.md`에 없는 사실을 만들지 않는다. 원본에 없으면 "커버레터로 보완" 등 정직한 대안.
+- **팩트 유지** — 제안이 `src/.my/my-resume.md`에 없는 사실을 만들지 않는다. 원본에 없으면 "커버레터로 보완" 등 정직한 대안.
 - **냉정하게** — 통과 가능성이 낮으면 낮다고 판정. 목적은 시간 낭비 방지.
 
 ## Output 형식
@@ -88,10 +100,24 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 ```
 ✅ 최종 검토 완료 → outcome/{company}/4_refine/{company}-final-check.md
 
-통과 가능성 '높음/보통' + 수정 반영 완료 시:
-  → 우선순위 수정 리스트(산문 AI 티 포함)를 outcome/{company}/4_refine/{company}-final.md에 직접 반영
-  → /pdf-resume 로 제출본 생성
+'높음' 또는 '보통':
+  1. 우선순위 수정 리스트를 outcome/{company}/4_refine/{company}-final.md에 직접 반영
+  2. **무엇을 고쳤는지 changelog에 기록한다** (아래 참조)
+  3. ▶ **이어서 /pdf-resume 를 바로 실행한다.** 사용자에게 묻지 않는다
+  4. 보고할 때 **자동 반영한 수정 목록을 함께 낸다** — 제출본이 조용히 바뀌면 안 된다
 
-'낮음'이면:
-  → 수정 리스트 반영 후 재검토
+'낮음':
+  🛑 **여기서 멈춘다.** 수정 리스트와 판정 근거를 보고하고 답을 기다린다.
+     통과 가능성이 낮은 문서를 PDF로 뽑는 것은 시간 낭비다
 ```
+
+### ⚠️ final.md를 고치는 손이 둘이다
+
+`refine-resume`가 만든 파일을 이 스킬이 다시 고친다. 기록이 없으면 **`/refine-resume`를 다시 돌리는 순간
+여기서 반영한 수정이 통째로 사라진다.** 그래서 반영분을 `outcome/{company}/4_refine/{company}-changelog.md`에
+`| 항목 | 변경 전 | 변경 후 | 근거: final-check |` 행으로 남긴다.
+
+> **이어달리기 규칙** — 파이프라인은 사용자가 매 단계 커맨드를 치지 않아도 이어진다.
+> 멈추는 곳은 셋뿐이다: ① `/evaluate-jd` 등급 판정 ② `/cross-verify` BLOCK ③ `/final-check` '낮음'.
+> 그 외에는 **묻지 말고 다음 스킬을 바로 실행한다.** 중간에 사용자가 끼어들면 그 지시가 우선한다.
+

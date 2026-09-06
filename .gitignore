@@ -19,15 +19,13 @@ src/photo-original-backup.jpg
 .omc/
 .omx/
 
-# Personal real resume — never track
-src/my-resume.md
-
-# Company JDs — never track (any naming style, any location, keep example)
+# Company JDs at the old flat location — never track (keep example)
 src/*_jd.md
 src/*-jd.md
-src/applied/
-src/pending/
 !src/example-jd.md
 
 # Pipeline outputs — real personal resume content, never track (회사별 패키지 구조: outcome/{company}/{stage}/)
 outcome/
+
+# 개인정보 영역 — 절대 추적 금지 (숨김 디렉토리라 상위 규칙에 안 걸림)
+src/.my/
