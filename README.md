@@ -3,7 +3,7 @@
 
 JD를 분석해 맞춤 이력서를 자동 생성하고, 면접까지 준비하는 Claude Code 기반 구직 자동화 시스템.
 
-> 📦 **예시 파일 포함**: `src/my-resume.md` (가상 인물), `src/example-jd.md`, `outcome/` 예시 출력물로 파이프라인 전체 흐름을 즉시 확인할 수 있습니다.
+> 📦 **예시 파일 포함**: `src/example-my-resume.md` (가상 인물), `src/example-jd.md`, `outcome/` 예시 출력물로 파이프라인 전체 흐름을 즉시 확인할 수 있습니다.
 
 ---
 
@@ -20,7 +20,7 @@ JD를 분석해 맞춤 이력서를 자동 생성하고, 면접까지 준비하�
 ## 파이프라인 개요
 
 ```
-src/my-resume.md  +  src/pending/{company}_jd.md
+src/.my/my-resume.md  +  src/.my/jd/pending/{company}_jd.md
           │
           ▼
   /evaluate-jd       →  outcome/{company}/0_evaluate/{company}-evaluate.md   (사전 필터)
@@ -32,17 +32,21 @@ src/my-resume.md  +  src/pending/{company}_jd.md
   /verify-resume     →  outcome/{company}/2_verify/{company}-verify.md
           │
           ▼
+  /cross-verify      →  outcome/{company}/2_verify/{company}-cross-verify.md   (오귀속 게이트)
+          │              └─ BLOCK이면 /review-resume 가 시작을 거부한다
+          ▼
   /review-resume     →  outcome/{company}/3_review/{company}-review.md
           │
           ▼
   /refine-resume     →  outcome/{company}/4_refine/{company}-final.md
           │
           ▼
-  /final-check       →  outcome/{company}/4_refine/{company}-final-check.md  (채용자 시각 최종 게이트)
+  /final-check       →  outcome/{company}/4_refine/{company}-final-check.md
+outcome/{company}/4_refine/{company}-changelog.md  (채용자 시각 최종 게이트)
           │
           ▼
     /pdf-resume      →  outcome/{company}/5_pdf/{company}-final.html + .pdf
-          │              └─ 완료 시 JD를 src/pending/ → src/applied/ 로 이동
+          │              └─ 완료 시 JD를 src/.my/jd/pending/ → src/.my/jd/applied/ 로 이동
           ▼
     /portfolio       →  outcome/{company}/6_portfolio/{company}-portfolio.html + .pdf  (선택)
 
@@ -62,10 +66,11 @@ src/my-resume.md  +  src/pending/{company}_jd.md
 ### 1단계: 파일 준비
 
 ```
-src/
-├── my-resume.md              ← 내 원본 이력서 작성 (팩트 기준, 절대 수정 금지)
-├── pending/{company}_jd.md   ← 미지원·진행중 JD 붙여넣기
-└── applied/{company}_jd.md   ← /pdf-resume 완료 시 자동 이동
+src/.my/                          ← 개인정보 영역, 통째로 gitignore
+├── my-resume.md                  ← 내 원본 이력서 작성 (팩트 기준, 절대 수정 금지)
+└── jd/
+    ├── pending/{company}_jd.md   ← 미지원·진행중 JD 붙여넣기
+    └── applied/{company}_jd.md   ← /pdf-resume 완료 시 이동
 ```
 
 > `{company}` 예시: `kakao`, `toss`, `line-plus` 등 회사명 영문 소문자
@@ -75,7 +80,7 @@ src/
 # 예시
 https://r.jina.ai/careers.kakao.com/jobs/12345
 ```
-가져온 내용을 `src/{company}-jd.md`에 붙여넣으면 AI가 훨씬 정확하게 분석합니다.
+가져온 내용을 `src/.my/jd/pending/{company}_jd.md`에 붙여넣으면 AI가 훨씬 정확하게 분석합니다.
 
 ### 2단계: Claude Code에서 파이프라인 실행
 
@@ -83,13 +88,13 @@ https://r.jina.ai/careers.kakao.com/jobs/12345
 # Claude Code 실행
 claude
 
-# (선택) JD 적합도 사전 평가 — B 이상이면 지원 추천
+# JD 적합도 사전 평가 — 여기서 한 번 멈춘다 (지원할지는 사람이 정한다)
 /evaluate-jd
 
-# 슬래시 커맨드 순서대로 실행
+# 진행하기로 했으면 이것 하나로 리뷰까지 알아서 간다 (리포트만 내는 구간)
 /draft-resume
-/verify-resume
-/review-resume
+
+# 리뷰 결과를 보고 나서, 여기부터는 직접 호출한다 (제출본을 고치는 구간)
 /refine-resume
 /final-check
 /pdf-resume
@@ -104,7 +109,35 @@ claude
 /interview-debrief {녹취 파일 경로}
 ```
 
-각 커맨드를 실행하면 Claude가 자동으로 파일을 읽고 결과물을 `outcome/` 하위 폴더에 저장합니다.
+**앞 구간은 자동, 뒷 구간은 수동입니다.** 경계는 "리포트만 내는가"와 "제출본 문장을 다시 쓰는가"입니다.
+
+```
+/evaluate-jd  🛑 등급 판정 — 지원 여부는 사람이 정한다
+     │
+     ▼
+┌─ 자동 (리포트만 낸다. 제출본을 건드리지 않는다) ─────────────┐
+│  /draft-resume → /verify-resume → /cross-verify            │
+│                                        │                    │
+│                        🛑 BLOCK이면 멈춘다                   │
+│                        PASS면 계속 ↓                        │
+│                                  /review-resume            │
+└────────────────────────────────────────────────────────────┘
+     │
+     ▼  🛑 누적 결과를 한 번에 보고하고 멈춘다
+        (적합도 등급 / 팩트 ❌ 건수 / 교차검증 지적 / 리뷰 점수)
+     │
+┌─ 수동 (여기부터 제출본을 고친다. 사람이 시작한다) ───────────┐
+│  /refine-resume   🛑  무엇을 고쳤는지 보고                   │
+│  /final-check     🛑  수정 목록과 판정 근거 보고             │
+│  /pdf-resume      ✅  제출본 확정 + JD를 applied/로          │
+└────────────────────────────────────────────────────────────┘
+```
+
+**왜 이렇게 나눴나** — 사고는 전부 뒤쪽 구간에서 났습니다. 오귀속(수치가 엉뚱한 줄에 붙음), 게이트 우회,
+분량 게이트에서 떨어진 PDF가 "지원 완료"로 기록된 것. 앞 구간은 리포트만 내므로 잘못돼도 리포트만 다시
+만들면 되지만, 뒤쪽은 제출본이 바뀌고 되돌리는 절차가 없습니다.
+
+개별 스킬을 따로 돌리고 싶으면 그 커맨드만 치면 됩니다.
 
 > 💡 **중간 결과물이 쌓여 파일을 일일이 열어보기 번거로울 때**: `/dashboard`를 실행하면 `outcome/` 전체를 스캔해 브라우저에서 바로 볼 수 있는 `dashboard.html`을 생성합니다. 자세한 내용은 [📊 파이프라인 대시보드](#-파이프라인-대시보드) 섹션을 참고하세요.
 
@@ -123,6 +156,7 @@ oh-my-career/
 │       ├── evaluate-jd/
 │       ├── draft-resume/
 │       ├── verify-resume/
+│       ├── cross-verify/
 │       ├── review-resume/
 │       ├── refine-resume/
 │       ├── final-check/
@@ -157,12 +191,15 @@ oh-my-career/
 outcome/{company}/0_evaluate/{company}-evaluate.md
 outcome/{company}/1_draft/{company}-draft-{A|B|C}.md
 outcome/{company}/2_verify/{company}-verify.md
+outcome/{company}/2_verify/{company}-cross-verify.md
 outcome/{company}/3_review/{company}-review.md
 outcome/{company}/4_refine/{company}-final.md
 outcome/{company}/4_refine/{company}-final-check.md
+outcome/{company}/4_refine/{company}-changelog.md
 outcome/{company}/5_pdf/{company}-final.html
 outcome/{company}/5_pdf/{company}-final.pdf
 outcome/{company}/6_portfolio/{company}-portfolio.html
+outcome/{company}/6_portfolio/{company}-portfolio.pdf
 outcome/{company}/interview/{company}-interview.md
 outcome/{company}/interview/{company}-debrief-{N}차.md
 outcome/{company}/interview/raw/{company}-{N}차-녹취.md
@@ -173,7 +210,7 @@ outcome/interview/question-bank.md
 
 **예시** (피치페이 지원 시):
 ```
-src/pending/peachpay_jd.md
+src/.my/jd/pending/peachpay_jd.md
 outcome/peachpay/1_draft/peachpay-draft-A.md
 outcome/peachpay/1_draft/peachpay-draft-B.md
 outcome/peachpay/1_draft/peachpay-draft-C.md
@@ -206,7 +243,7 @@ JD와 원본 이력서를 대조해 **10차원 가중 스코어링**으로 A-F �
 
 ### 1. `/draft-resume` — 전략별 초안 3가지 생성
 
-`src/my-resume.md`와 JD를 분석해 **서로 다른 전략**의 초안 3가지를 자동 생성합니다.
+`src/.my/my-resume.md`와 JD를 분석해 **서로 다른 전략**의 초안 3가지를 자동 생성합니다.
 
 | 버전 | 전략 |
 |------|------|
@@ -223,6 +260,15 @@ JD와 원본 이력서를 대조해 **10차원 가중 스코어링**으로 A-F �
 - 버전별 **추천 순위** 결정
 
 > 👀 **검토 포인트**: ❌ 항목은 반드시 처리해야 하지만, ⚠️ 항목은 맥락에 따라 유지할 수도 있습니다. 리포트를 맹목적으로 따르지 말고 직접 판단하세요.
+
+### 2.5 `/cross-verify` — 독립 서브 에이전트 교차검증 (오귀속 게이트)
+
+- 문맥을 공유하지 않는 서브 에이전트 5개가 **수치 귀속, 시스템 경계, 인용 금지, 원본 미존재, JD 과장**을 각각 검증
+- `/verify-resume`는 초안을 만든 흐름 안에서 돌아 초안의 프레임을 그대로 받는다. 이 단계는 그 앵커링을 깬다
+- **값이 맞아도 붙은 자리가 틀리면 ❌** — 실제 사고가 여기서 났다. 수치는 전부 원본에 있었는데 엉뚱한 줄에 붙어 FAIL이 안 떴다
+- ❌ 1건이라도 있으면 **BLOCK**, `/review-resume`가 시작을 거부한다
+
+> 👀 **검토 포인트**: "이번엔 수치가 단순하니 괜찮다"는 판단으로 건너뛰지 마세요. 사고는 전부 그 판단에서 났습니다.
 
 ### 3. `/review-resume` — 채용자 시각 품질 리뷰
 
@@ -293,7 +339,7 @@ JD와 원본 이력서를 대조해 **10차원 가중 스코어링**으로 A-F �
 ```
 
 - **질문별 분석**: 유형·꼬리질문 깊이·면접관 반응까지 메타데이터로 분해 (꼬리질문 3단 이상 = 가장 강한 신호)
-- **🔴 사실 오류 + 이력서 대조**: `src/my-resume.md`와 대조해 **원본에 없는 수치·경험을 말했는지** 잡습니다
+- **🔴 사실 오류 + 이력서 대조**: `src/.my/my-resume.md`와 대조해 **원본에 없는 수치·경험을 말했는지** 잡습니다
 - **면접관 힌트 채굴**: *"저희는 보통 ~하는데요"* 류 발화를 전부 뽑아냅니다 — 그 팀의 실제 스택과 기대 답안이 거기 있습니다
 - **⭐ 회차 누적**: `outcome/interview/debrief-index.md`에 회차·점수 추이를 쌓고, **2회 이상 반복된 지적은 자동으로 최우선 액션 아이템으로 승격**합니다 (`🔁 N회째`)
 - 받은 질문은 `question-bank.md`에 append — 회사가 달라도 질문은 반복됩니다
@@ -344,10 +390,10 @@ file:///path/to/oh-my-career/dashboard.html
 
 ## 🔒 핵심 규칙
 
-- `src/my-resume.md`는 팩트 기준 — **이 파일의 수치/사실을 절대 변형하지 않는다**
+- `src/.my/my-resume.md`는 팩트 기준 — **이 파일의 수치/사실을 절대 변형하지 않는다**
 - 원본에 없는 숫자나 사실을 생성하지 않는다
 - 각 단계 결과물은 반드시 해당 `outcome/` 하위폴더에 저장한다
-- **단계를 건너뛰지 않는다** (draft → verify → review → refine → pdf 순서 준수)
+- **단계를 건너뛰지 않는다** (draft → verify → **cross-verify** → review → refine → **final-check** → pdf 순서 준수)
 
 ---
 
@@ -356,16 +402,17 @@ file:///path/to/oh-my-career/dashboard.html
 이 레포에는 가상 인물 **김개발**을 기준으로 한 예시 파일이 포함되어 있습니다.
 
 ```
-src/my-resume.md          → 가상 인물 예시 이력서 (결제/핀테크 백엔드 엔지니어)
+src/example-my-resume.md  → 가상 인물 예시 이력서 (결제/핀테크 백엔드 엔지니어)
 src/example-jd.md         → 가상 회사 "피치페이" JD
-outcome/1_draft/          → 전략별 초안 3가지 예시
-outcome/2_verify/         → 팩트 검증 리포트 예시
-outcome/3_review/         → 품질 리뷰 리포트 예시
-outcome/4_refine/         → 마크다운 최종본 예시
-outcome/5_pdf/            → HTML + PDF 예시
+outcome/{company}/1_draft/    → 전략별 초안 3가지 예시
+outcome/{company}/2_verify/   → 팩트 검증 + 교차검증 리포트 예시
+outcome/{company}/3_review/   → 품질 리뷰 리포트 예시
+outcome/{company}/4_refine/   → 마크다운 최종본 + 최종 검토 예시
+outcome/{company}/5_pdf/      → HTML + PDF 예시
 ```
 
-실제 사용 시 `src/my-resume.md`를 본인 이력서로 교체하고 지원 회사 JD 파일을 추가하면 됩니다.
+실제 사용 시 `src/.my/my-resume.md`에 본인 이력서를 두고 `src/.my/jd/pending/`에 JD를 추가하면 됩니다.
+`src/.my/`는 통째로 gitignore 처리되어 있습니다.
 
 ---
 

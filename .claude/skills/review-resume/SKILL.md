@@ -14,6 +14,29 @@ description: Use when resume drafts have been verified and need deep quality rev
 
 **기본 경로** (oh-my-career 프로젝트):
 - 검증 리포트: `outcome/{company}/2_verify/{company}-verify.md`
+- 교차검증 게이트: `head -8 outcome/{company}/2_verify/{company}-cross-verify.md` — **게이트 줄만 읽는다**
+  (지적 목록 전문이 필요한 건 `/refine-resume`이지 리뷰가 아니다. 전문을 읽으면 12KB를 0.4KB 대신 올린다)
+
+### 🚫 시작 전 중단 조건 (2.5단계 게이트)
+
+아래 둘 중 하나면 **리뷰를 시작하지 않고 즉시 중단**한다. 리뷰는 표현과 구조를 보는 단계라,
+수치가 엉뚱한 줄에 붙어 있어도 통과시킨다 — 그래서 이 게이트가 리뷰보다 앞에 있어야 한다.
+
+```
+1) cross-verify 리포트 파일이 없다
+   ❌ outcome/{company}/2_verify/{company}-cross-verify.md 가 없습니다.
+      2.5단계를 건너뛰었습니다. /cross-verify 를 먼저 실행하세요.
+
+2) `^GATE:` 줄이 PASS가 아니다
+   ❌ 교차검증 게이트가 PASS가 아닙니다.
+      검증했던 파일을 직접 고치고 /cross-verify 를 재실행하세요.
+      (`/refine-resume`를 태우지 않는다 — 이 시점엔 3_review 리포트가 없어 refine이 읽을 것이 없다)
+
+3) 리포트의 `검증 대상:` 줄이 이번 리뷰 대상과 다르다
+   ❌ 문서 X에 대한 PASS로 문서 Y를 리뷰할 수 없습니다.
+```
+
+**"이번엔 수치가 단순해서 괜찮다"는 판단으로 넘기지 않는다.** 실제 사고는 전부 그 판단에서 났다.
 - 초안: `outcome/{company}/1_draft/{company}-draft-{추천버전}.md`
 - 출력: `outcome/{company}/3_review/{company}-review.md`
 
@@ -21,8 +44,11 @@ description: Use when resume drafts have been verified and need deep quality rev
 
 ### Step 1: 파일 로드
 
+한 번에 배치로 읽는다:
+
 ```
-Read: outcome/{company}/2_verify/{company}-verify.md    ← 추천 버전 확인
+head -8 outcome/{company}/2_verify/{company}-cross-verify.md   ← 게이트 PASS/BLOCK (먼저 확인)
+Read: outcome/{company}/2_verify/{company}-verify.md            ← 추천 버전 확인
 Read: outcome/{company}/1_draft/{company}-draft-{추천버전}.md
 ```
 
@@ -67,7 +93,7 @@ STAR 밀도:
 
 ### Step 5: 전체 구조 리뷰
 
-- **길이**: 적정 분량인가 (1~2페이지 기준)
+- **길이**: 대략 1-2페이지 규모인가 (**마크다운 기준 추정**. 실제 페이지 수는 /pdf-resume 가 실측한다)
 - **밀도**: 정보가 균형있게 분배됐는가
 - **우선순위**: 중요한 내용이 앞에 오는가
 - **가독성**: 채용자가 30초 안에 핵심을 파악할 수 있는가
@@ -118,5 +144,24 @@ STAR 밀도:
 
 ```
 ✅ 리뷰 리포트 저장 완료 → outcome/{company}/3_review/
-→ 다음 단계: /refine-resume 로 최종 완성본 생성
+🛑 **여기서 자동 연결이 끝난다. `/refine-resume`를 자동으로 실행하지 않는다.**
+
+   지금까지 4단계가 사람 없이 돌았으므로, **누적 결과를 한 번에 보고한다:**
+   - JD 적합도 등급
+   - 팩트 검증 ❌/⚠️ 건수
+   - 교차검증 게이트와 지적 목록
+   - 리뷰 점수와 필수 수정 항목
+
+   다음은 사용자가 `/refine-resume`를 호출한다. 여기부터는 제출본 문장을 다시 쓰는 구간이라
+   **무엇을 반영할지 사람이 정한다.**
 ```
+
+> **이어달리기 규칙 (앞 구간만)** — 파이프라인은 **`/review-resume`까지만** 자동으로 이어진다.
+> `draft → verify → cross-verify → review`는 전부 **리포트만 내는 단계**라 사람이 볼 게 없다.
+>
+> **`/refine-resume`부터는 사용자가 직접 호출한다.** refine, final-check, pdf는 제출본 문장을 다시 쓰거나
+> 제출본을 확정하는 단계다. 사고는 전부 이 뒤쪽 구간에서 났다 — 오귀속, 게이트 우회, 게이트에서
+> 떨어진 PDF가 "지원 완료"로 기록된 것 전부.
+>
+> 중간에 사용자가 끼어들면 그 지시가 우선한다.
+
