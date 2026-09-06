@@ -12,11 +12,11 @@ description: Use when resume drafts have been created and need fact-checking aga
 
 ## Input
 
-> 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
+> `{RESUME}`과 `{JD}`가 **어느 디렉토리에 있는지는 CLAUDE.md 「경로 해석」에만 적혀 있다.** 파일명은 바뀌지 않지만 위치는 바뀐다. 못 찾으면 스킬이 아니라 그 표를 고친다.
 
 **기본 경로** (oh-my-career 프로젝트):
-- 원본 이력서: `{RESUME}`
-- JD: `{JD}`
+- 원본 이력서: `{RESUME}` (`my-resume.md`)
+- JD: `{JD}` (`{company}_jd.md`)
 - 검증 대상: `outcome/{company}/1_draft/{company}-draft-*.md`
 - 출력: `outcome/{company}/2_verify/{company}-verify.md`
 

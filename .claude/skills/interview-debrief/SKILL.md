@@ -14,11 +14,11 @@ description: Use when the user wants to review a past interview — real or mock
 
 ## Input
 
-> 경로 이름(`{RESUME}`, `{JD}`)의 정의는 **CLAUDE.md 「경로 해석」** 한 곳에 있다. 파일을 못 찾으면 스킬을 고치지 말고 그 표를 고친다.
+> `{RESUME}`과 `{JD}`가 **어느 디렉토리에 있는지는 CLAUDE.md 「경로 해석」에만 적혀 있다.** 파일명은 바뀌지 않지만 위치는 바뀐다. 못 찾으면 스킬이 아니라 그 표를 고친다.
 
 - **녹취 텍스트** (필수) — 사용자가 붙여넣거나 파일 경로 제공
-- `{RESUME}` — 팩트 대조 기준 (**필수로 읽는다**)
-- `{JD}` — 평가 축 가중치
+- `{RESUME}` (`my-resume.md`) — 팩트 대조 기준 (**필수로 읽는다**)
+- `{JD}` (`{company}_jd.md`) — 평가 축 가중치
 - `outcome/interview/debrief-index.md` — 이전 회차 누적 (있으면 반드시 읽는다)
 
 ## Output — 파일 3개
@@ -71,7 +71,7 @@ Q&A 블록으로 분해하고 각각에 메타데이터를 붙인다:
 
 ### Step 3. 🔴 이력서 대조 (프로젝트 고유 — 건너뛰지 말 것)
 
-`{RESUME}`를 읽고 녹취와 대조한다.
+`{RESUME}` (`my-resume.md`)를 읽고 녹취와 대조한다.
 
 | 검사 | 판정 |
 |---|---|
