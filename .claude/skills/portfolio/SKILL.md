@@ -35,7 +35,7 @@ description: Use when a résumé is finalized and the application also asks for 
 - **C. 중복 금지** — 경력기술서와 같은 문장 재탕 시 실패. 확장·심화여야 한다.
 - **D. 시각화 필수** — before/after·flow 다이어그램을 **CSS 박스로 자체 렌더**. 텍스트 벽 금지.
 - **E. 팩트 고정** — 모든 수치·기술은 `my-resume.md` 근거. 없으면 생성 금지. "왜 어려웠나" 같은 서술도 원본 사실 범위 내에서만.
-- **F. 자기완결** — A4 인쇄, 폰트 임베드, px 금지 mm 단위, PDF 3~6p.
+- **F. 자기완결** — A4 인쇄, 폰트 임베드, px 금지 mm 단위. 페이지 수는 CLAUDE.md 「분량 기준」.
 
 ## Process
 
