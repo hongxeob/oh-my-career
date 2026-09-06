@@ -16,9 +16,11 @@ description: Use when a résumé is finalized and the application also asks for 
 
 ## Input
 
-- 팩트 기준: `src/my-resume.md`
+> `{RESUME}`과 `{JD}`가 **어느 디렉토리에 있는지는 CLAUDE.md 「경로 해석」에만 적혀 있다.** 파일명은 바뀌지 않지만 위치는 바뀐다. 못 찾으면 스킬이 아니라 그 표를 고친다.
+
+- 팩트 기준: `{RESUME}` (`my-resume.md`)
 - 강조점 파악: `outcome/{company}/4_refine/{company}-final.md`
-- 프로젝트 우선순위: `src/pending/{company}_jd.md` (또는 `src/applied/`) — JD에 중요한 프로젝트를 flagship으로
+- 프로젝트 우선순위: `{JD}` (`{company}_jd.md`)  — JD에 중요한 프로젝트를 flagship으로
 - 선택: instruction/ 이미지·배경 자료 (있으면 문제 정의에 반영, 단 PDF엔 외부 이미지 임베드 금지 — §Critical 참조)
 
 ## Output
@@ -39,7 +41,7 @@ description: Use when a résumé is finalized and the application also asks for 
 
 ### Step 1: 로드 및 flagship 선정
 ```
-Read: src/my-resume.md, outcome/{company}/4_refine/{company}-final.md, src/pending/{company}_jd.md
+Read: {RESUME}, outcome/{company}/4_refine/{company}-final.md, {JD}
 ```
 JD 핵심 요구와 최상위로 매칭되는 프로젝트 2~3개 선정. 각 프로젝트에 원본에서 쓸 수 있는
 `문제 / 설계결정 / 트러블슈팅 / 수치` 재료가 충분한지 확인 (부족하면 다른 프로젝트로 교체).
@@ -73,23 +75,23 @@ before/after = `.diagram > .dcol(Before) + .dvs(→) + .dcol(After)`.
 정상/장애 = `.flow`에 `.box` 나열 + `→`.
 
 프린트 CSS: `@page { size:A4; margin:16mm }`, Noto Sans KR 임베드, `li{break-inside:avoid}`,
-`.page{break-before:page}`. 참고 구현: `outcome/tving/6_portfolio/tving-portfolio.html`.
+`.page{break-before:page}`.
 
-### Step 3: PDF 변환
+### Step 3-4: PDF 변환과 렌더 게이트
+
+공용 스크립트가 렌더, 페이지 수, 폰트, 페이지별 텍스트 밀도를 한 번에 낸다. **셸 명령을 여기 새로 적지 않는다** —
+Chrome 경로와 검사 방법은 `_shared/render-pdf.sh` 한 곳에만 둔다(예전에 각자 적었다가 이 스킬만 낡아서 죽었다).
+
 ```bash
-pkill -f "Google Chrome" 2>/dev/null; sleep 1
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
-  --print-to-pdf="outcome/{company}/6_portfolio/{company}-portfolio.pdf" --no-pdf-header-footer \
-  "file:///$(pwd)/outcome/{company}/6_portfolio/{company}-portfolio.html"
+bash .claude/skills/_shared/render-pdf.sh \
+  outcome/{company}/6_portfolio/{company}-portfolio.html \
+  outcome/{company}/6_portfolio/{company}-portfolio.pdf 6
 ```
 
-### Step 4: 렌더 게이트 (자동 루프)
-```bash
-pdfinfo ...pdf | grep Pages
-for p in $(seq 1 N); do pdftotext -f $p -l $p ...pdf - | grep -v '^$' | head -2; done
-```
-- **빈 페이지·오버플로우**(한 줄만 넘어간 페이지) 발견 시 → 밀도 조정(font-size·line-height·padding, 또는 해당 문장 축약) 후 Step 3 재실행.
-- 목표 3~6p, 빈 페이지 0, 다이어그램 안 깨짐. 통과할 때까지 반복.
+- `⚠️ 거의 빈 페이지` 또는 오버플로우(한 줄만 넘어간 페이지) → 밀도 조정(font-size, line-height, padding, 또는 해당 문장 축약) 후 재실행.
+- 목표 3-6p, 빈 페이지 0, 다이어그램 안 깨짐.
+- **반복 상한 3회.** 3회에 못 맞추면 멈추고 사용자에게 현재 페이지 구성과 막힌 지점을 보고한다. 무한 루프 금지.
+- 렌더 전 예산: 본문 HTML 약 12KB = 2페이지(2026-09 실측). 3-6p면 대략 18-36KB. `wc -c`로 먼저 재고 크게 벗어나면 렌더하기 전에 조정한다.
 
 ## Verification (작성 후 별도 검증 패스 — 자기승인 금지)
 

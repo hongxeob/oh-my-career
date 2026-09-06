@@ -31,9 +31,15 @@ description: Use when you want to visualize the resume pipeline status. Triggers
 
 `outcome/` 바로 아래 서브폴더 목록이 곧 회사 목록이다 (회사별 패키지 구조: `outcome/{company}/{stage}/`).
 
+```bash
+find outcome -mindepth 3 -maxdepth 3 -type f \( -name '*.md' -o -name '*.pdf' -o -name '*.html' \) | sort
 ```
-Glob: outcome/*/0_evaluate/*-evaluate.md   (또는 outcome/*/ 자체를 디렉토리 목록으로 스캔)
-```
+
+**한 번의 `find`로 회사 목록과 단계별 파일 존재를 동시에 얻는다.** 회사마다 8종을 따로 확인하면 회사 수에
+비례해 왕복이 늘어난다.
+
+⚠️ **`0_evaluate` 기준으로 회사를 찾지 않는다.** 예전엔 `Glob: outcome/*/0_evaluate/*-evaluate.md`를 썼는데,
+평가를 건너뛰고 draft부터 시작한 회사가 목록에서 통째로 빠졌다.
 
 `outcome/interview/`(공통 스토리 뱅크 전용, 회사 아님)는 회사 목록에서 제외한다.
 회사명 중복 제거 후 알파벳 순 정렬.
@@ -44,11 +50,21 @@ Glob: outcome/*/0_evaluate/*-evaluate.md   (또는 outcome/*/ 자체를 디렉�
 
 | 단계 | 파일 | done 조건 |
 |------|------|-----------|
-| draft | `outcome/{company}/1_draft/{company}-draft-A.md` | A 파일 존재 |
+| evaluate | `outcome/{company}/0_evaluate/{company}-evaluate.md` | 존재 |
+| draft | `outcome/{company}/1_draft/{company}-draft-{A,B,C}.md` | **3개 전부 존재** (A만 있으면 부분 실행이다) |
 | verify | `outcome/{company}/2_verify/{company}-verify.md` | 존재 |
+| **cross-verify** | `outcome/{company}/2_verify/{company}-cross-verify.md` | 존재 **&& `^GATE:` 줄이 PASS** |
 | review | `outcome/{company}/3_review/{company}-review.md` | 존재 |
 | refine | `outcome/{company}/4_refine/{company}-final.md` | 존재 |
-| pdf | `outcome/{company}/5_pdf/{company}-final.html` 또는 `-final.pdf` | 둘 중 하나 존재 |
+| **final-check** | `outcome/{company}/4_refine/{company}-final-check.md` | 존재 |
+| pdf | `outcome/{company}/5_pdf/{company}-final.pdf` | **PDF 존재** |
+| portfolio (선택) | `outcome/{company}/6_portfolio/{company}-portfolio.pdf` | 존재 |
+
+⚠️ **pdf의 done 조건에 `.html`을 넣지 않는다.** 예전엔 `html 또는 pdf`였는데, Chrome을 못 찾아 HTML만 남고
+제출본이 없는 상태를 "pdf 완료"로 칠했다. 제출할 수 있는 건 PDF다.
+
+⚠️ **cross-verify와 final-check를 빠뜨리지 않는다.** 이 둘은 건너뛰기를 막으려고 만든 게이트인데, 대시보드가
+추적하지 않으면 **게이트를 건너뛴 회사가 "완료"로 표시되어** 장치가 무력화된다.
 
 draft의 B, C 파일도 각각 존재 여부 확인:
 - `outcome/{company}/1_draft/{company}-draft-B.md`
@@ -80,13 +96,34 @@ HTML/PDF 파일은 읽지 않는다.
 ### Step 4: 다음 단계 커맨드 결정 (회사마다)
 
 ```
-draft 없음   → /draft-resume {company}
-verify 없음  → /verify-resume {company}
-review 없음  → /review-resume {company}
-refine 없음  → /refine-resume {company}
-pdf 없음     → /pdf-resume {company}
-전부 완료    → "🎉 파이프라인 완료"
+evaluate 없음        → /evaluate-jd {company}
+draft 없음           → /draft-resume {company}
+verify 없음          → /verify-resume {company}
+cross-verify 없음    → /cross-verify {company}
+cross-verify BLOCK   → ⛔ 교차검증 BLOCK — 검증 대상 파일을 직접 고치고 /cross-verify 재실행
+review 없음          → /review-resume {company}
+refine 없음          → /refine-resume {company}
+final-check 없음     → /final-check {company}
+pdf 없음             → /pdf-resume {company}
+전부 완료            → "🎉 파이프라인 완료"
 ```
+
+### Step 4.5: JD 지원 상태 수렴 (놓친 이동 자동 복구)
+
+PDF가 있는데 JD가 아직 `pending/`에 있으면 **사용자에게 알린다. 자동으로 옮기지 않는다.**
+
+⚠️ 예전엔 여기서 자동으로 옮겼는데, PDF 파일 존재만 보고 판단해서 **분량 게이트에서 떨어진 PDF도
+"지원 완료"로 기록**됐다. 지금은 실패한 PDF를 렌더 스크립트가 지우지만, 이 이동은 파일시스템에 남는
+유일한 "지원함" 신호이고 되돌리는 절차가 없다. **비대칭이 큰 조작은 사람이 확인한다.**
+
+```bash
+find src -type d -name pending -o -type d -name applied | while read d; do echo "[$d]"; ls "$d"; done
+```
+
+`/pdf-resume` Step 5가 이 이동을 하지만, 파일명 표기가 어긋나 건너뛴 적이 있다(2026-09). 대시보드는 어차피
+`outcome/` 전체를 스캔하므로 **여기가 마지막 그물**이다. 커맨드를 하나 더 만들지 않고 여기서 수렴시킨다.
+회사 폴더명과 JD 파일명 표기가 다를 수 있으니(하이픈 vs 언더스코어, 직무 접미사) 글롭에 의존하지 말고
+`ls` 결과를 눈으로 대조한다.
 
 ### Step 5: dashboard.html 생성
 

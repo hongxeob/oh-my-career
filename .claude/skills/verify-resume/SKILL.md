@@ -12,9 +12,11 @@ description: Use when resume drafts have been created and need fact-checking aga
 
 ## Input
 
+> `{RESUME}`과 `{JD}`가 **어느 디렉토리에 있는지는 CLAUDE.md 「경로 해석」에만 적혀 있다.** 파일명은 바뀌지 않지만 위치는 바뀐다. 못 찾으면 스킬이 아니라 그 표를 고친다.
+
 **기본 경로** (oh-my-career 프로젝트):
-- 원본 이력서: `src/my-resume.md`
-- JD: `src/pending/{company}_jd.md` (또는 `src/applied/`)
+- 원본 이력서: `{RESUME}` (`my-resume.md`)
+- JD: `{JD}` (`{company}_jd.md`)
 - 검증 대상: `outcome/{company}/1_draft/{company}-draft-*.md`
 - 출력: `outcome/{company}/2_verify/{company}-verify.md`
 
@@ -23,9 +25,9 @@ description: Use when resume drafts have been created and need fact-checking aga
 ### Step 1: 파일 로드
 
 ```
-Read: src/my-resume.md                        ← 팩트 기준
-Read: src/pending/{company}_jd.md              ← JD 기준
-Read: outcome/{company}/1_draft/               ← 검증할 초안들
+Read: {RESUME}          ← 팩트 기준
+Read: {JD}               ← JD 기준
+Glob: outcome/{company}/1_draft/{company}-draft-*.md   ← 검증할 초안들 (디렉토리를 Read하면 실패한다)
 ```
 
 ### Step 2: 팩트 검증
@@ -50,10 +52,9 @@ JD 필수/우대 요건 대비 초안 커버리지:
 
 | JD 요건 | 구분 | 초안 반영 여부 | 위치 |
 |---------|------|---------------|------|
-| Java/Kotlin + Spring | 필수 | ✅ 반영 | 스킬 섹션 |
-| 3년 이상 경력 | 필수 | ⚠️ 경력 계산 필요 | 헤더 |
-| OMS/WMS 경험 | 우대 | ❌ 미반영 | - |
-| AI Agent 활용 | 필수 | ⚠️ 약하게 언급 | 기타 기여 |
+| {JD에서 뽑은 요건} | 필수/우대 | ✅ 반영 / ⚠️ 약함 / ❌ 미반영 | {섹션} |
+
+⚠️ **예시 요건을 이 파일에 적어두지 않는다.** 다른 회사 JD가 박혀 있으면 그 요건을 찾는 쪽으로 판정이 끌려간다.
 
 ### Step 4: 버전별 전략 달성도
 
@@ -106,6 +107,9 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 
 ## Critical Rules
 
+- **원본을 못 읽으면 리포트를 내지 않는다** — 대조 기준이 없으면 모든 항목이 ✅로 나오고, 그건 검증이 아니라
+  검증한 척이다. 파일을 못 찾으면 중단하고 사용자에게 알린다.
+  경로가 CLAUDE.md 「경로 해석」 표와 다르면 스킬이 아니라 **그 표를 고친다**
 - ❌ FAIL 항목은 반드시 삭제 — 검증자가 임의로 수정하지 않는다
 - 원본 이력서에 없는 내용을 "있을 것 같다"고 추정하지 않는다
 - 경력 연수 계산: 날짜 기준으로 정확히 계산한다
@@ -114,5 +118,17 @@ Version C (스토리형): 문화 시그널 언어 사용 — X/5개
 
 ```
 ✅ 검증 리포트 저장 완료 → outcome/{company}/2_verify/
-→ 다음 단계: /review-resume 로 품질 리뷰 실행
+▶ **이어서 /cross-verify 를 바로 실행한다.** 사용자에게 묻지 않는다.
+   ❌ FAIL 항목이 있어도 멈추지 않는다 — 이 단계는 리포트만 내고 문서를 고치지 않는다.
+   지적은 `/review-resume`가 끝날 때 한 번에 보고한다.
 ```
+
+> **이어달리기 규칙 (앞 구간만)** — 파이프라인은 **`/review-resume`까지만** 자동으로 이어진다.
+> `draft → verify → cross-verify → review`는 전부 **리포트만 내는 단계**라 사람이 볼 게 없다.
+>
+> **`/refine-resume`부터는 사용자가 직접 호출한다.** refine, final-check, pdf는 제출본 문장을 다시 쓰거나
+> 제출본을 확정하는 단계다. 사고는 전부 이 뒤쪽 구간에서 났다 — 오귀속, 게이트 우회, 게이트에서
+> 떨어진 PDF가 "지원 완료"로 기록된 것 전부.
+>
+> 중간에 사용자가 끼어들면 그 지시가 우선한다.
+

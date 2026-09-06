@@ -15,21 +15,50 @@ description: Use when resume drafts have been reviewed and need final refinement
 **기본 경로** (oh-my-career 프로젝트):
 - 초안: `outcome/{company}/1_draft/{company}-draft-{추천버전}.md`
 - 검증: `outcome/{company}/2_verify/{company}-verify.md`
+- 교차검증: `outcome/{company}/2_verify/{company}-cross-verify.md`
 - 리뷰: `outcome/{company}/3_review/{company}-review.md`
 - 출력: `outcome/{company}/4_refine/{company}-final.md`
+
+
+### 🚫 교차검증 게이트 (모든 하류 노드가 각자 검사한다)
+
+```bash
+CV=outcome/{company}/2_verify/{company}-cross-verify.md
+[ -f "$CV" ] || { echo "❌ 교차검증 리포트가 없다. /cross-verify 를 먼저 실행하라."; exit 1; }
+grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
+```
+
+`GATE: PASS`가 아니면 **중단하고 사용자에게 보고한다.**
+
+⚠️ **게이트를 `review-resume` 한 곳에만 두지 않는다.** 예전에 그랬는데, BLOCK 복구 경로(사용자가 "고쳐줘"라고
+답한 뒤)가 하필 그 노드를 지나가지 않아서 **review와 cross-verify를 둘 다 건너뛰고 제출본이 나올 수 있었다.**
+사용자의 "진행"은 *고치라는 동의*였지 *제출하라는 동의*가 아니다. 게이트는 하류 전 노드가 각자 검사한다.
+
+⚠️ **`grep BLOCK`으로 판정하지 마라.** 리포트 본문에 회차 이력(`1차 BLOCK → 3차 PASS`)이 적히면 통과한
+문서를 거부하거나 그 반대가 된다. **`^GATE:` 줄 하나만** 본다.
 
 ## Process
 
 ### Step 1: 파일 로드 및 수정 목록 통합
 
+한 번에 배치로 읽는다:
+
 ```
 Read: outcome/{company}/1_draft/{company}-draft-{추천버전}.md    ← 베이스
 Read: outcome/{company}/2_verify/{company}-verify.md             ← 필수 삭제/수정
+Read: outcome/{company}/2_verify/{company}-cross-verify.md       ← ❌ 오귀속 = Priority 0
 Read: outcome/{company}/3_review/{company}-review.md             ← 표현 개선
+Read: outcome/{company}/4_refine/{company}-changelog.md          ← 있으면 (아래)
 ```
+
+⚠️ **changelog를 반드시 읽는다.** `final-check`가 최종본을 직접 고치고 그 내역을 여기 남긴다.
+이 파일을 안 읽고 초안에서 다시 만들면 **그 수정이 통째로 사라진다.** 기록만 하고 읽지 않으면
+로그는 남고 문서는 사라진다 — 그건 방어가 아니다.
+**근거가 `final-check`인 행은 재적용한다.**
 
 수정 목록을 우선순위 순서로 통합:
 ```
+[Priority 0] cross-verify ❌ 오귀속 항목 — 최우선. 수치를 옳은 줄로 옮기거나 삭제
 [Priority 1] verify ❌ 항목 — 반드시 처리
 [Priority 2] review ❌ 항목 — 반드시 처리
 [Priority 3] verify ⚠️ 항목 — 처리 권고
@@ -64,14 +93,11 @@ review ❌ 항목 처리:
 ### Step 3.6: 하우스 스타일 적용 (final-check 재작업 방지)
 
 `.claude/skills/final-check/house-style.md`를 읽고 **Tier 1 전 항목**을 최종본에 적용한다.
-이 단계에서 걸러야 final-check에서 되돌아오는 왕복이 없다. 특히 자주 걸리는 것:
+이 단계에서 걸러야 final-check에서 되돌아오는 왕복이 없다. 치환 함정(가운뎃점을 슬래시로 바꾸면 AND가 OR로
+뒤집히는 것)도 그 파일에 있다.
 
-- 산문(Summary·회사 소개 블록쿼트)의 가운뎃점 나열 → 쉼표·`~와/과`, 진짜 병렬 명사만 슬래시
-- Em dash로 절 잇기 → 접속사로 녹임 (`**제목** — 부제` 헤더 형식만 예외)
-- 숫자 범위 물결표(`20~30ms`) → 하이픈(`20-30ms`)
-- 피동형·과잉 명사화·무생물 주어 → 능동, 동사 직접, 사람 주어
-
-⚠️ 가운뎃점을 슬래시로 바꿀 때 **동사를 잇는 가운뎃점**(`재구축·운영` = AND)은 슬래시(OR)로 바꾸면 의미가 뒤집힌다. `및`·`하고`·쉼표를 쓴다. 일괄 치환 후 각 줄을 다시 읽어 확인할 것.
+⚠️ **금지 패턴 목록을 이 파일에 복사해두지 않는다.** 사본은 반드시 낡는다 — 실제로 `draft-resume`에 남아 있던
+옛 사본이 house-style 개정 뒤에도 폐기된 규칙을 적용하게 만들었고, 그 표기가 제출본까지 갔다.
 
 ### Step 4: 최종 자가 체크
 
@@ -87,31 +113,49 @@ review ❌ 항목 처리:
 [ ] 기술 스택이 JD 순서와 정렬됐는가
 [ ] 각 경력 항목에 회사 소개 블록쿼트와 회사별 기술 스택 줄이 있는가
 [ ] house-style.md Tier 1 위반이 없는가 (가운뎃점·em dash·물결표·피동형)
-[ ] 전체 2페이지 이내인가 (PDF 기준)
+[ ] 분량이 대략 2페이지 규모인가 (**추정**이다. 실측은 /pdf-resume 가 한다)
 ```
 
 ### Step 5: 최종본 저장
 
-`outcome/{company}/4_refine/{company}-final.md`에 저장:
+**파일을 둘로 나눠 저장한다.**
+
+**① `outcome/{company}/4_refine/{company}-final.md` — 이력서 본문만.**
+
+제목줄부터 마지막 줄까지 **전부 제출본**이다. 생성일, 기반 버전, 적용 피드백, 변경 이력 같은
+파이프라인 메타를 이 파일에 넣지 않는다.
 
 ```markdown
-# {company} 지원 이력서 — 최종본
+# {이름} | {직군}
+
+{연락처 한 줄}
+
+---
+
+## Summary
+...
+```
+
+⚠️ **메타를 넣으면 제출본이 오염된다.** `/pdf-resume`는 이 파일을 그대로 HTML에 넣는다. 예전엔 리포트
+래퍼를 씌우고 "첫 `---` 다음부터가 본문"이라는 위치 규칙으로 잘라냈는데, **연락처 아래 구분선이 첫 `---`라서
+그 규칙대로면 이름과 연락처가 잘려나간다.** 위치로 자르지 말고 애초에 섞지 않는다.
+
+**② `outcome/{company}/4_refine/{company}-changelog.md` — 메타 전부.**
+
+```markdown
+# {company} 최종본 변경 이력
 생성일: {date}
 기반: outcome/{company}/1_draft/{company}-draft-{버전}.md
-적용 피드백: verify + review 전체
+적용 피드백: verify + cross-verify + review
 
----
-
-[완성된 이력서 전문]
-
----
-
-## 변경 이력
 | 항목 | 변경 전 | 변경 후 | 근거 |
 |------|---------|---------|------|
-| ... | ... | ... | verify ❌ |
+| ... | ... | ... | cross-verify ❌ |
 | ... | ... | ... | review ❌ |
 ```
+
+`/final-check`도 자기가 반영한 수정을 이 파일에 덧붙인다 — final.md를 고치는 손이 둘이라 기록이 없으면
+refine 재실행 때 조용히 사라진다.
 
 ## Critical Rules
 
@@ -124,11 +168,18 @@ review ❌ 항목 처리:
 
 ```
 ✅ 최종본 저장 완료 → outcome/{company}/4_refine/{company}-final.md
+🛑 **여기서 멈춘다.** 무엇을 어떻게 고쳤는지 보고하고 답을 기다린다.
+   다음은 사용자가 `/final-check`를 호출한다.
 
-이력서 파이프라인 완료:
-  src/my-resume.md + src/pending/{company}_jd.md
-  → outcome/{company}/1_draft/  (초안 3가지)
-  → outcome/{company}/2_verify/ (팩트/JD 검증)
-  → outcome/{company}/3_review/ (품질 리뷰)
-  → outcome/{company}/4_refine/ (최종 제출본)
+파이프라인은 아직 끝나지 않았다: refine(4) → final-check(4.5) → pdf-resume(5).
 ```
+
+> **이어달리기 규칙 (앞 구간만)** — 파이프라인은 **`/review-resume`까지만** 자동으로 이어진다.
+> `draft → verify → cross-verify → review`는 전부 **리포트만 내는 단계**라 사람이 볼 게 없다.
+>
+> **`/refine-resume`부터는 사용자가 직접 호출한다.** refine, final-check, pdf는 제출본 문장을 다시 쓰거나
+> 제출본을 확정하는 단계다. 사고는 전부 이 뒤쪽 구간에서 났다 — 오귀속, 게이트 우회, 게이트에서
+> 떨어진 PDF가 "지원 완료"로 기록된 것 전부.
+>
+> 중간에 사용자가 끼어들면 그 지시가 우선한다.
+

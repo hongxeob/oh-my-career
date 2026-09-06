@@ -21,6 +21,24 @@ description: Use when a finalized resume markdown exists and needs to be convert
 - `outcome/{company}/5_pdf/{company}-final.html`
 - `outcome/{company}/5_pdf/{company}-final.pdf`
 
+
+### 🚫 교차검증 게이트 (모든 하류 노드가 각자 검사한다)
+
+```bash
+CV=outcome/{company}/2_verify/{company}-cross-verify.md
+[ -f "$CV" ] || { echo "❌ 교차검증 리포트가 없다. /cross-verify 를 먼저 실행하라."; exit 1; }
+grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
+```
+
+`GATE: PASS`가 아니면 **중단하고 사용자에게 보고한다.**
+
+⚠️ **게이트를 `review-resume` 한 곳에만 두지 않는다.** 예전에 그랬는데, BLOCK 복구 경로(사용자가 "고쳐줘"라고
+답한 뒤)가 하필 그 노드를 지나가지 않아서 **review와 cross-verify를 둘 다 건너뛰고 제출본이 나올 수 있었다.**
+사용자의 "진행"은 *고치라는 동의*였지 *제출하라는 동의*가 아니다. 게이트는 하류 전 노드가 각자 검사한다.
+
+⚠️ **`grep BLOCK`으로 판정하지 마라.** 리포트 본문에 회차 이력(`1차 BLOCK → 3차 PASS`)이 적히면 통과한
+문서를 거부하거나 그 반대가 된다. **`^GATE:` 줄 하나만** 본다.
+
 ## Process
 
 ### Step 1: 파일 로드 및 회사명 감지
@@ -37,12 +55,16 @@ Read: outcome/{company}/4_refine/{company}-final.md
 - 폴더명/파일명에서 `{company}` 자동 파싱 (예: `outcome/kakao-style/4_refine/kakao-style-final.md` → `kakao-style`)
 - `src/photo.jpg` 존재 여부 확인
 
-**⚠️ 최종본에서 이력서 본문만 추출한다.** `refine-resume`의 출력은 리포트 래퍼 형식이므로 아래는 **HTML에 넣지 않는다**:
-- 상단 메타(`# {company} 지원 이력서 — 최종본`, `생성일`, `기반`, `적용 피드백`)
-- 하단 `## 변경 이력` 표
-- `**전략적 의도**` 문단
+**`{company}-final.md`는 제출본 그 자체다 — 첫 줄부터 마지막 줄까지 전부 HTML에 넣는다.**
+파이프라인 메타는 `{company}-changelog.md`에 따로 있다.
 
-첫 `---` 구분선 다음부터 `## 변경 이력` 직전까지가 이력서 본문이다.
+⚠️ **위치로 자르지 않는다.** 예전엔 "첫 `---` 다음부터 `## 변경 이력` 직전까지가 본문"이라는 규칙이었는데
+두 가지가 깨져 있었다: ① 연락처 아래 구분선이 첫 `---`라서 **이름과 연락처가 잘려나간다**
+② `## 변경 이력`이 별도 파일로 빠져 끝 앵커를 못 찾는다.
+
+**옛 형식(리포트 래퍼가 씌워진 final.md)을 만나면** 아래만 걷어내고 나머지는 전부 본문으로 취급한다:
+- 상단 메타(`# {company} 지원 이력서 — 최종본`, `생성일:`, `기반:`, `적용 피드백:`)
+- `## 변경 이력` 표와 `**전략적 의도**` 문단
 
 ### Step 2: HTML 변환 (템플릿 치환)
 
@@ -102,39 +124,56 @@ Write 도구로 HTML 전문을 저장한다.
 
 ### Step 4: PDF 변환
 
-HTML 저장 완료 후 Chrome headless 명령을 실행한다:
+HTML 저장 후 공용 스크립트 한 번으로 렌더와 검사를 끝낸다. 렌더, 페이지 수, 폰트, 페이지별 텍스트 밀도가
+한 번에 나온다. **셸 명령을 여기 새로 적지 않는다** — 환경 지식은 `_shared/render-pdf.sh` 한 곳에만 둔다.
 
 ```bash
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless --disable-gpu \
-  --print-to-pdf="outcome/{company}/5_pdf/{company}-final.pdf" \
-  --no-pdf-header-footer \
-  "file://$(pwd)/outcome/{company}/5_pdf/{company}-final.html"
+bash .claude/skills/_shared/render-pdf.sh \
+  outcome/{company}/5_pdf/{company}-final.html \
+  outcome/{company}/5_pdf/{company}-final.pdf 2
+echo "rc=$?"   # 0=통과  2=분량 게이트 실패  3=환경 오류
 ```
 
-- Bash 실행이 가능한 경우 직접 실행하여 PDF 생성 완료 확인
-- 실행 실패 시 위 명령어를 사용자에게 출력하고 수동 실행 안내
+**렌더 전 분량 예산** — 렌더해봐야 페이지 수를 아는 왕복을 줄인다. 템플릿 CSS가 고정이라 바이트와 페이지가
+거의 비례한다: **본문 HTML 약 12KB = 2페이지**(2026-09 실측: 12,114 B → 정확히 2p).
+Step 3에서 HTML을 저장한 직후 `wc -c`로 재고, 13KB를 넘으면 렌더하기 전에 줄인다.
 
-**페이지 수 확인 (필수)** — 같은 명령에 이어 붙여 한 번에 확인한다:
+스크립트가 `❌ 목표 초과`로 끝나면 페이지 경계를 본다. 앞 페이지가 절반 넘게 비었는데 다음 페이지가 꽉 차 있으면
+`break-inside: avoid` 계열이 원인이다(Step 2 경고 참조). **콘텐츠를 줄이기 전에 CSS부터 의심할 것.**
+
+Chrome이 없어 스크립트가 멈추면 스크립트가 출력하는 설치 명령을 사용자에게 안내한다.
+
+
+### Step 5: JD 파일 pending → applied 이동 (건너뛰지 않는다)
+
+PDF 생성 확인 후 JD를 `applied/`로 옮긴다.
 
 ```bash
-pdfinfo outcome/{company}/5_pdf/{company}-final.pdf | grep -E "Pages|File size"
+PENDING=$(find src -type d -name pending | head -1)      # 경로는 바뀐다. 디렉토리 이름으로 찾는다
+# 가드 없이 진행하면 dirname "" = "." 이라 리포 루트에 applied/ 를 만들고
+# mv 소스가 "/파일명" (파일시스템 루트)이 된다. 게다가 mkdir 은 exit 0 이라 조용하다.
+[ -n "$PENDING" ] && [ -d "$PENDING" ] || { echo "❌ pending 디렉토리를 찾을 수 없다. 중단한다."; exit 1; }
+APPLIED=$(dirname "$PENDING")/applied
+mkdir -p "$APPLIED"
+ls "$PENDING"                                            # 먼저 실제 파일명을 본다
+mv "$PENDING/<실제파일명>" "$APPLIED/"
 ```
 
-`grep -c "/Type /Page"`로 세지 말 것 — `/Type /Pages`까지 잡혀 부정확하다.
+⚠️ **`{company}*_jd.md` 글롭에 의존하지 않는다.** 회사 폴더명과 JD 파일명이 다른 표기를 쓴다:
+회사 폴더는 하이픈(`some-corp`)인데 JD 파일은 언더스코어에 직무 접미사가 붙어 있거나(`some_corp_server_jd.md`),
+폴더명과 JD 파일명의 회사 표기 자체가 다를 수 있다.
+글롭은 이 둘 다 매치하지 못한다. **`ls`로 눈으로 확인하고 옮긴다.**
 
-목표는 2페이지. 3페이지가 나오면 페이지 경계를 확인한다:
+**이미 `applied/`에 있으면 성공으로 간주하고 넘어간다** (재실행 안전). PDF만 다시 뽑을 때 이 단계가 실패로
+보이면 안 된다.
 
-```bash
-pdftotext -layout outcome/{company}/5_pdf/{company}-final.pdf - | awk 'BEGIN{p=1} /\f/{p++;next}{print p": "$0}'
-```
+🚫 **Step 4가 rc=0이 아니면 이 단계를 실행하지 않는다.** 렌더 스크립트는 실패 시 PDF를 지우지만,
+이 이동은 파일시스템에 남는 유일한 "지원함" 신호이고 되돌리는 절차가 없다. 게이트에서 떨어진 문서를
+"지원 완료"로 기록하지 않는다.
 
-앞 페이지가 절반 넘게 비었는데 다음 페이지가 꽉 차 있으면 `break-inside: avoid` 계열이 원인이다(Step 2 경고 참조). 콘텐츠를 줄이기 전에 CSS부터 의심할 것.
-
-### Step 5: JD 파일 pending → applied 이동
-
-PDF 생성 확인 후, `src/pending/{company}_jd.md`(또는 `{company}-jd.md`)가 존재하면 `src/applied/`로 이동한다(`mv`).
-`src/pending/`에 없으면(이미 applied에 있거나 다른 위치) 건너뛴다 — 실패로 취급하지 않는다.
+**JD가 pending/에 없으면 건너뛰지 말고 어디 있는지 찾아 옮긴다.** 이 이동이 "지원함 / 안 함"을 구분하는
+유일한 장치다. 실제로 경로가 어긋났다는 이유로 이 단계를 건너뛴 적이 있고(2026-09), 그 결과 어디까지
+지원했는지 파일 구조로 알 수 없는 상태가 됐다. 경로가 문서와 다르면 **문서를 고치고 옮긴다.**
 
 ## Critical Rules
 
@@ -149,14 +188,15 @@ PDF 생성 확인 후, `src/pending/{company}_jd.md`(또는 `{company}-jd.md`)�
 ```
 ✅ HTML 저장 완료 → outcome/{company}/5_pdf/{company}-final.html
 ✅ PDF 생성 완료 → outcome/{company}/5_pdf/{company}-final.pdf ({N}페이지)
-{JD를 옮겼으면}  ✅ JD 이동 완료 → src/pending/{company}_jd.md → src/applied/{company}_jd.md
-{옮길 게 없었으면} ⏭️ JD 이동 생략 — src/pending/에 해당 JD 없음
+{JD를 옮겼으면}  ✅ JD 이동 완료 → pending/{실제 파일명} → applied/{실제 파일명}
+{옮길 게 없었으면} ⏭️ JD 이동 생략 — pending/에 해당 JD 없음 (이미 applied면 성공으로 친다)
 
 이력서 파이프라인 완료:
-  src/my-resume.md + src/applied/{company}_jd.md
-  → outcome/{company}/1_draft/  (초안 3가지)
-  → outcome/{company}/2_verify/ (팩트/JD 검증)
-  → outcome/{company}/3_review/ (품질 리뷰)
-  → outcome/{company}/4_refine/ (마크다운 최종본)
-  → outcome/{company}/5_pdf/    (HTML + PDF 제출본)
+  {RESUME} + {JD}
+  → outcome/{company}/0_evaluate/ (JD 적합도)
+  → outcome/{company}/1_draft/    (초안 3가지)
+  → outcome/{company}/2_verify/   (팩트/JD 검증 + 교차검증)
+  → outcome/{company}/3_review/   (품질 리뷰)
+  → outcome/{company}/4_refine/   (최종본 + 최종 검토)
+  → outcome/{company}/5_pdf/      (HTML + PDF 제출본)
 ```
