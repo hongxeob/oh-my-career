@@ -91,6 +91,9 @@ h4 {
 }
 
 ul { padding-left: 1.2em; margin: 2px 0; }
+/* 마커에 Latin 폰트 명시 — Noto Sans KR의 disc 글리프가 작은 font-size에서
+   반달 모양으로 잘려 렌더된다 (9.5pt에서 실측 확인됨). */
+li::marker { font-family: 'Helvetica Neue', Arial, sans-serif; }
 li { margin-bottom: 1px; }
 li > ul { margin: 2px 0; }
 li > ul > li { font-size: 9pt; color: #333; margin-bottom: 1px; }
