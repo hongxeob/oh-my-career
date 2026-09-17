@@ -35,7 +35,7 @@ header {
 header h1 { font-size: 18pt; margin: 0 0 2px 0; }
 header .title { font-size: 11pt; color: #444; margin: 0 0 4px 0; }
 header .contact { font-size: 9pt; color: #555; margin: 0; }
-header .contact a { color: #555; text-decoration: none; }
+header .contact a { color: #0b6bcb; text-decoration: none; }
 
 .photo {
   width: 30mm;
@@ -48,7 +48,7 @@ header .contact a { color: #555; text-decoration: none; }
 /* break-inside: avoid 금지 — section/.company-block에 걸면 큰 블록이 통째로
    다음 페이지로 밀려 앞 페이지 절반이 빈 채로 페이지가 하나 늘어난다 (실측 확인됨). */
 section {
-  margin-bottom: 3mm;
+  margin-bottom: 6mm;
 }
 
 /* 마지막 섹션의 아래 여백이 페이지 경계를 넘으면 텍스트 없는 빈 페이지가 생긴다 (2026-09 실측). */
@@ -64,10 +64,10 @@ h2 {
 }
 
 h4 {
-  font-size: 10pt;
+  font-size: 9.5pt;
   font-weight: 700;
-  margin: 5px 0 3px 0;
-  color: #333;
+  margin: 3mm 0 1mm 0;
+  color: #0b6bcb;
 }
 
 .company-block {
@@ -79,22 +79,23 @@ h4 {
   justify-content: space-between;
   font-size: 10.5pt;
   font-weight: 700;
-  margin-bottom: 2px;
+  margin: 3mm 0 1mm 0;
 }
 
 .company-intro {
   font-size: 9pt;
-  color: #555;
+  color: #666;
+  font-style: italic;
   border-left: 2px solid #ddd;
-  padding-left: 6px;
-  margin: 2px 0 5px 0;
+  padding-left: 2mm;
+  margin: 0 0 2mm 0;
 }
 
 ul { padding-left: 1.2em; margin: 2px 0; }
 /* 마커에 Latin 폰트 명시 — Noto Sans KR의 disc 글리프가 작은 font-size에서
    반달 모양으로 잘려 렌더된다 (9.5pt에서 실측 확인됨). */
 li::marker { font-family: 'Helvetica Neue', Arial, sans-serif; }
-li { margin-bottom: 1px; }
+li { margin-bottom: 2px; }
 li > ul { margin: 2px 0; }
 li > ul > li { font-size: 9pt; color: #333; margin-bottom: 1px; }
 
