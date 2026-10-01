@@ -11,7 +11,7 @@ description: Use when a résumé is finalized and the application also asks for 
 지원 폼이 경력기술서 텍스트박스와 별도로 "포트폴리오 첨부"를 요구할 때, 대표 프로젝트 2~3개를
 아키텍처 다이어그램 + 설계 의사결정(왜) + 트러블슈팅 딥다이브 + 수치로 깊게 푼 PDF를 만든다.
 
-**핵심 정체성: 경력기술서 ≠ 포트폴리오.** 경력기술서서 아낀 메커니즘·트레이드오프를 여기서 푼다.
+**핵심 정체성: 경력기술서 ≠ 포트폴리오.** 경력기술서에서 아낀 메커니즘·트레이드오프를 여기서 푼다.
 경력기술서와 문장을 재탕하면 실패다.
 
 ## Input
@@ -31,7 +31,7 @@ description: Use when a résumé is finalized and the application also asks for 
 ## Design Rubric (작성 시 강제)
 
 - **A. 선택과 집중** — flagship 2~3개만. JD 매칭 최상위 프로젝트. 전 경력 나열 금지.
-- **B. 깊이 우선** — 프로젝트마다 `문제 → 아키텍처 → 설계 결정(왜) → 트러블슈팅 딥다이브 → 결과(수치)`. "무엇을 했다"가 아니라 **"왜 그렇게 설계했나"**. 경력기술서서 뺀 메커니즘(구현 디테일·트레이드오프)을 여기서 푼다.
+- **B. 깊이 우선** — 프로젝트마다 `문제 → 아키텍처 → 설계 결정(왜) → 트러블슈팅 딥다이브 → 결과(수치)`. "무엇을 했다"가 아니라 **"왜 그렇게 설계했나"**. 경력기술서에서 뺀 메커니즘(구현 디테일·트레이드오프)을 여기서 푼다.
 - **C. 중복 금지** — 경력기술서와 같은 문장 재탕 시 실패. 확장·심화여야 한다.
 - **D. 시각화 필수** — before/after·flow 다이어그램을 **CSS 박스로 자체 렌더**. 텍스트 벽 금지.
 - **E. 팩트 고정** — 모든 수치·기술은 `my-resume.md` 근거. 없으면 생성 금지. "왜 어려웠나" 같은 서술도 원본 사실 범위 내에서만.
@@ -85,13 +85,13 @@ Chrome 경로와 검사 방법은 `_shared/render-pdf.sh` 한 곳에만 둔다(�
 ```bash
 bash .claude/skills/_shared/render-pdf.sh \
   outcome/{company}/6_portfolio/{company}-portfolio.html \
-  outcome/{company}/6_portfolio/{company}-portfolio.pdf 6
+  outcome/{company}/6_portfolio/{company}-portfolio.pdf 6   # 6 = CLAUDE.md 「분량 기준」 포트폴리오 상한
 ```
 
 - `⚠️ 거의 빈 페이지` 또는 오버플로우(한 줄만 넘어간 페이지) → 밀도 조정(font-size, line-height, padding, 또는 해당 문장 축약) 후 재실행.
 - 빈 페이지 0, 다이어그램 안 깨짐. 목표 페이지 범위는 CLAUDE.md 「분량 기준」.
 - **반복 상한 3회.** 3회에 못 맞추면 멈추고 사용자에게 현재 페이지 구성과 막힌 지점을 보고한다. 무한 루프 금지.
-- 렌더 전 예산: 본문 HTML **약 6KB당 1페이지**(2026-09 실측). 목표 범위는 CLAUDE.md 「분량 기준」의 포트폴리오 행을 본다. `wc -c`로 먼저 재고 크게 벗어나면 렌더하기 전에 조정한다.
+- 렌더 전 예산은 CLAUDE.md 「분량 기준」 (HTML 바이트당 페이지). `wc -c`로 먼저 재고 크게 벗어나면 렌더 전에 조정한다.
 
 ## Verification (작성 후 별도 검증 패스 — 자기승인 금지)
 

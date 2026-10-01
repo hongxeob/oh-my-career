@@ -20,22 +20,13 @@ description: Use when resume drafts have been reviewed and need final refinement
 - 출력: `outcome/{company}/4_refine/{company}-final.md`
 
 
-### 🚫 교차검증 게이트 (모든 하류 노드가 각자 검사한다)
+### 🚫 교차검증 게이트
 
 ```bash
-CV=outcome/{company}/2_verify/{company}-cross-verify.md
-[ -f "$CV" ] || { echo "❌ 교차검증 리포트가 없다. /cross-verify 를 먼저 실행하라."; exit 1; }
-grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
+bash .claude/skills/_shared/check-gate.sh {company} || exit 1   # PASS가 아니면 중단하고 사용자에게 보고한다
 ```
 
-`GATE: PASS`가 아니면 **중단하고 사용자에게 보고한다.**
-
-⚠️ **게이트를 `review-resume` 한 곳에만 두지 않는다.** 예전에 그랬는데, BLOCK 복구 경로(사용자가 "고쳐줘"라고
-답한 뒤)가 하필 그 노드를 지나가지 않아서 **review와 cross-verify를 둘 다 건너뛰고 제출본이 나올 수 있었다.**
-사용자의 "진행"은 *고치라는 동의*였지 *제출하라는 동의*가 아니다. 게이트는 하류 전 노드가 각자 검사한다.
-
-⚠️ **`grep BLOCK`으로 판정하지 마라.** 리포트 본문에 회차 이력(`1차 BLOCK → 3차 PASS`)이 적히면 통과한
-문서를 거부하거나 그 반대가 된다. **`^GATE:` 줄 하나만** 본다.
+하류 노드는 모두 각자 이 게이트를 부른다. 한 곳에서만 빼도 우회 경로가 생긴다 (근거: check-gate.sh 헤더).
 
 ## Process
 
@@ -109,6 +100,7 @@ review ❌ 항목 처리:
 [ ] 원본에 없는 수치가 남아있지 않은가
 [ ] JD 필수 키워드가 자연스럽게 포함됐는가
 [ ] Summary가 3-4문장 이내인가
+[ ] Summary가 house-style 「Summary 구성」 뼈대(정체성 → 근거 → 일하는 방식 → 회사가 찾는 결)를 따르는가. 성과 축약 나열이 아닌가
 [ ] 가장 강한 성과가 각 경력 최상단에 있는가
 [ ] 기술 스택이 JD 순서와 정렬됐는가
 [ ] 각 경력 항목에 회사 소개 블록쿼트와 회사별 기술 스택 줄이 있는가
@@ -175,12 +167,5 @@ refine 재실행 때 조용히 사라진다.
 파이프라인은 아직 끝나지 않았다: refine(4) → final-check(4.5) → pdf-resume(5).
 ```
 
-> **이어달리기 규칙 (앞 구간만)** — 파이프라인은 **`/review-resume`까지만** 자동으로 이어진다.
-> `draft → verify → cross-verify → review`는 전부 **리포트만 내는 단계**라 사람이 볼 게 없다.
->
-> **`/refine-resume`부터는 사용자가 직접 호출한다.** refine, final-check, pdf는 제출본 문장을 다시 쓰거나
-> 제출본을 확정하는 단계다. 사고는 전부 이 뒤쪽 구간에서 났다 — 오귀속, 게이트 우회, 게이트에서
-> 떨어진 PDF가 "지원 완료"로 기록된 것 전부.
->
-> 중간에 사용자가 끼어들면 그 지시가 우선한다.
+> 자동 연결은 `/review-resume`까지다. `/refine-resume`부터는 사용자가 호출한다 (CLAUDE.md 「핵심 규칙」). 중간에 사용자가 끼어들면 그 지시가 우선한다.
 

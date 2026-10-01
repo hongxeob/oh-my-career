@@ -66,32 +66,13 @@ find outcome -mindepth 3 -maxdepth 3 -type f \( -name '*.md' -o -name '*.pdf' -o
 ⚠️ **cross-verify와 final-check를 빠뜨리지 않는다.** 이 둘은 건너뛰기를 막으려고 만든 게이트인데, 대시보드가
 추적하지 않으면 **게이트를 건너뛴 회사가 "완료"로 표시되어** 장치가 무력화된다.
 
-draft의 B, C 파일도 각각 존재 여부 확인:
-- `outcome/{company}/1_draft/{company}-draft-B.md`
-- `outcome/{company}/1_draft/{company}-draft-C.md`
-
 ### Step 3: 파일 읽기 (상세 모드에서만)
 
 **현황 모드면 이 단계를 통째로 건너뛴다** — 모든 `content`를 `null`로 두고 Step 4로 간다.
 
-상세 모드일 때만, 대상 회사의 존재하는 MD 파일을 Read 도구로 읽어 내용 수집:
-
-```
-Read: outcome/{company}/1_draft/{company}-draft-A.md  (있는 경우)
-Read: outcome/{company}/1_draft/{company}-draft-B.md  (있는 경우)
-Read: outcome/{company}/1_draft/{company}-draft-C.md  (있는 경우)
-Read: outcome/{company}/2_verify/{company}-verify.md  (있는 경우)
-Read: outcome/{company}/3_review/{company}-review.md  (있는 경우)
-Read: outcome/{company}/4_refine/{company}-final.md   (있는 경우)
-```
+상세 모드일 때만, 대상 회사의 Step 2 표에 있는 MD 파일 중 **존재하는 것**을 전부 Read 도구로 읽는다.
 
 HTML/PDF 파일은 읽지 않는다.
-
-### Step 3.5: 회사명 파싱 규칙 (참고)
-
-폴더명이 곧 회사명이므로 파일명에서 다시 파싱할 필요는 없다:
-- `outcome/kakao-style/1_draft/kakao-style-draft-A.md` → 회사명: `kakao-style`
-- `outcome/toss/2_verify/toss-verify.md` → 회사명: `toss`
 
 ### Step 4: 다음 단계 커맨드 결정 (회사마다)
 
@@ -148,11 +129,14 @@ const PIPELINE_DATA = {
     {
       name: "kakao-style",
       stages: {
-        draft: { done: true,  tabs: { A: "...md content...", B: "...md...", C: "...md..." } },
-        verify: { done: true,  content: "...md content..." },
-        review: { done: true,  content: "...md content..." },
-        refine: { done: false, content: null },
-        pdf:    { done: false, content: null }
+        evaluate:    { done: true,  content: "...md..." },
+        draft:       { done: true,  tabs: { A: "...md...", B: "...md...", C: "...md..." } },
+        verify:      { done: true,  content: "...md..." },
+        crossVerify: { done: true,  content: "...md..." },   // done = GATE: PASS
+        review:      { done: true,  content: "...md..." },
+        refine:      { done: false, content: null },
+        finalCheck:  { done: false, content: null },
+        pdf:         { done: false, content: null }
       },
       nextCommand: "/refine-resume kakao-style"
     }
@@ -188,13 +172,13 @@ oh-my-career Dashboard  |  생성: {generatedAt}
 
 **3. 진행률 스테퍼**
 ```
-● draft ─── ● verify ─── ○ review ─── ○ refine ─── ○ pdf
+● evaluate ─ ● draft ─ ● verify ─ ● cross-verify ─ ○ review ─ ○ refine ─ ○ final-check ─ ○ pdf
 ```
 - 완료(done: true): 채워진 원 `●` + 초록색(`--done`)
 - 미완료(done: false): 빈 원 `○` + 회색(`--pending`)
 
 **4. 콘텐츠 탭 (있는 것만 표시)**
-`Draft A | Draft B | Draft C | Verify | Review | Final`
+`Evaluate | Draft A | Draft B | Draft C | Verify | Cross-verify | Review | Final | Final-check`
 
 **5. 마크다운 뷰어**
 - `marked.js`로 렌더링

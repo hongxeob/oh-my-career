@@ -16,14 +16,8 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 
 - JD: `{JD}` (`{company}_jd.md`)
 - 최종본: `outcome/{company}/4_refine/{company}-final.md`
-- 원본(팩트 기준): **필요한 두 블록만** — 전문 45KB 중 이 단계가 쓰는 건 4.8KB다
-  ```bash
-  RESUME=$(find src -name 'my-resume.md' -not -path '*example*' | head -1)
-  [ -n "$RESUME" ] || { echo "❌ 팩트 원본을 찾을 수 없다. 중단한다."; exit 1; }   # 디렉토리는 바뀐다. 파일명으로 찾는다
-  grep -n '수치 귀속표\|시스템 경계\|인용 금지 목록' "$RESUME"   # 실제 줄 번호를 먼저 찾는다
-  sed -n '<찾은 범위>p' "$RESUME"
-  ```
-  개별 사실의 근거가 필요하면 그때 `grep -n` 으로 그 줄만 본다
+- 원본(팩트 기준): 상단 세 블록만. `bash .claude/skills/_shared/resume-facts.sh || exit 1`
+  개별 사실의 근거가 필요하면 그때 `grep -n`으로 그 줄만 본다
 - 하우스 스타일: `.claude/skills/final-check/house-style.md`
 - 이전 리뷰: `outcome/{company}/3_review/{company}-review.md` (있으면 — 아래 중복 방지 규칙)
 
@@ -33,7 +27,7 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 리뷰 리포트가 있으면 **그 항목들을 처음부터 다시 평가하지 말고, 지적 사항이 최종본에 반영됐는지만 확인**한다.
 반영됐으면 "✅ review 지적 반영 확인"으로 한 줄 처리하고 넘어간다.
 
-이 스킬이 **새로 판정할 고유 영역**은 아래 4가지다:
+이 스킬이 **새로 판정할 고유 영역**은 아래 6가지다:
 1. JD 매칭표(요건별 충분/약함/없음) — review에 없는 항목
 2. ATS 키워드 통과 가능성
 3. 하우스 스타일 위반(`house-style.md`)
@@ -42,7 +36,7 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
    review는 초안을 봤고, 순서를 바꾼 건 그 이후다. JD 필수 기술이 상단에 있는지, 실사용 경험 없는 기술이
    섞였는지 확인한다
 6. **불필요·중복·과잉 상세·리스크** — review에 대응 항목이 없다. 기준선이 없으므로 **새로 판정한다.**
-   아래 85행의 판정 기준을 쓴다. `[확인]`으로 처리하지 마라 — 예전에 그 표기가 섞여 있어서
+   Process 6번의 판정 기준을 쓴다. `[확인]`으로 처리하지 마라 — 예전에 그 표기가 섞여 있어서
    "중복 없음" 한 줄로 넘어갔고, 실제로는 제목과 자식이 같은 말을 하는 중복이 4건 있었다
 
 ⚠️ **리뷰 대상이 겹치면 이 경계가 무너진다.** 위 구분은 "review는 초안(`1_draft`)을, final-check는 최종본
@@ -58,22 +52,13 @@ description: Use when a refined resume is ready and needs a final recruiter-pers
 너는 15년 경력의 시니어 채용 담당자 겸 이력서 컨설턴트다. 이력서를 JD와 대조하여 최종 검토하되, 지원자에게 유리하게 포장하지 말고 실제로 서류 통과 확률을 높이는 데만 집중해 냉정하게 평가하라.
 
 
-### 🚫 교차검증 게이트 (모든 하류 노드가 각자 검사한다)
+### 🚫 교차검증 게이트
 
 ```bash
-CV=outcome/{company}/2_verify/{company}-cross-verify.md
-[ -f "$CV" ] || { echo "❌ 교차검증 리포트가 없다. /cross-verify 를 먼저 실행하라."; exit 1; }
-grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
+bash .claude/skills/_shared/check-gate.sh {company} || exit 1   # PASS가 아니면 중단하고 사용자에게 보고한다
 ```
 
-`GATE: PASS`가 아니면 **중단하고 사용자에게 보고한다.**
-
-⚠️ **게이트를 `review-resume` 한 곳에만 두지 않는다.** 예전에 그랬는데, BLOCK 복구 경로(사용자가 "고쳐줘"라고
-답한 뒤)가 하필 그 노드를 지나가지 않아서 **review와 cross-verify를 둘 다 건너뛰고 제출본이 나올 수 있었다.**
-사용자의 "진행"은 *고치라는 동의*였지 *제출하라는 동의*가 아니다. 게이트는 하류 전 노드가 각자 검사한다.
-
-⚠️ **`grep BLOCK`으로 판정하지 마라.** 리포트 본문에 회차 이력(`1차 BLOCK → 3차 PASS`)이 적히면 통과한
-문서를 거부하거나 그 반대가 된다. **`^GATE:` 줄 하나만** 본다.
+하류 노드는 모두 각자 이 게이트를 부른다. 한 곳에서만 빼도 우회 경로가 생긴다 (근거: check-gate.sh 헤더).
 
 ## Process (검토 항목)
 
@@ -82,7 +67,7 @@ grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
 1. `[고유]` **JD 적합도 매칭**: JD 핵심 요구사항(필수/우대 스킬·자격요건·키워드)을 항목별로 뽑아 이력서 대응 근거를 표로 정리. 각 항목 `충분/약함/없음` 표시, 없는 항목은 채우거나 재구성할 방법 제안.
 2. `[고유]` **ATS 통과 가능성**: JD 반복 핵심 키워드가 본문에 자연스럽게 포함됐는지 확인. 키워드 누락 / 동의어만 써서 매칭 안 됨 / 과도한 키워드 스터핑을 각각 지적.
 3. `[확인]` **성과의 정량화·구체성**: review의 STAR 밀도 지적이 반영됐는지 확인. 리뷰가 없으면 숫자·비율·규모·기간 빠진 문장을 찾아 개선 문장 제시.
-4. `[확인]` **6초 스캔 테스트**: review의 Summary 지적이 반영됐는지 확인. 리뷰가 없으면 첫인상 강도를 새로 평가.
+4. `[확인]` **6초 스캔 테스트**: review의 Summary 지적이 반영됐는지 확인. 리뷰가 없으면 첫인상 강도를 새로 평가. **Summary 4번 문장의 결**이 evaluate 리포트가 고른 결(`house-style.md` 「4번 문장의 결은 회사가 정한다」)과 맞는지 `[고유]`로 확인한다. 적극성을 기본값으로 넣었거나 결이 회사와 어긋나면 고친 문장을 낸다.
 5. `[고유]` **커리어 서사 일관성**: 경력 이동·공백기·직무 전환 흐름이 논리적인지. 채용자가 의문 가질 지점(잦은 이직·무관 경력 등) 짚고 대응 문구 제안.
 6. `[고유]` **불필요·중복·과잉 상세·리스크**: 아래 네 가지를 **각각 따로** 훑는다. "중복 없음" 같은 한 줄 결론을 내지 말고, 항목마다 원문을 인용하거나 "해당 없음"을 명시한다.
 
@@ -180,12 +165,5 @@ grep -m1 '^GATE:' "$CV"      # GATE: PASS 한 줄만 본다
 여기서 반영한 수정이 통째로 사라진다.** 그래서 반영분을 `outcome/{company}/4_refine/{company}-changelog.md`에
 `| 항목 | 변경 전 | 변경 후 | 근거: final-check |` 행으로 남긴다.
 
-> **이어달리기 규칙 (앞 구간만)** — 파이프라인은 **`/review-resume`까지만** 자동으로 이어진다.
-> `draft → verify → cross-verify → review`는 전부 **리포트만 내는 단계**라 사람이 볼 게 없다.
->
-> **`/refine-resume`부터는 사용자가 직접 호출한다.** refine, final-check, pdf는 제출본 문장을 다시 쓰거나
-> 제출본을 확정하는 단계다. 사고는 전부 이 뒤쪽 구간에서 났다 — 오귀속, 게이트 우회, 게이트에서
-> 떨어진 PDF가 "지원 완료"로 기록된 것 전부.
->
-> 중간에 사용자가 끼어들면 그 지시가 우선한다.
+> 자동 연결은 `/review-resume`까지다. `/refine-resume`부터는 사용자가 호출한다 (CLAUDE.md 「핵심 규칙」). 중간에 사용자가 끼어들면 그 지시가 우선한다.
 

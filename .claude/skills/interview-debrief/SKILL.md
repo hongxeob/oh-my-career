@@ -21,7 +21,7 @@ description: Use when the user wants to review a past interview — real or mock
 - `{JD}` (`{company}_jd.md`) — 평가 축 가중치
 - `outcome/interview/debrief-index.md` — 이전 회차 누적 (있으면 반드시 읽는다)
 
-## Output — 파일 3개
+## Output — 파일 4개
 
 ```
 outcome/{company}/interview/{company}-debrief-{N}차.md   # 리포트 본체

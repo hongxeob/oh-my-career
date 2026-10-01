@@ -16,7 +16,7 @@ description: Use when the user wants to build or update their interview story ba
 
 - 원본 이력서: `{RESUME}` (`my-resume.md`)
 - JD (선택): `{JD}` (`{company}_jd.md`)  — 있으면 해당 JD 맞춤, 없으면 범용 스토리 뱅크 생성
-- 기존 평가 (선택): 평가 리포트에서 **예상 질문 섹션만** 뽑는다. 리포트 전문은 49KB인데 필요한 건 6KB다
+- 기존 평가 (선택): 평가 리포트에서 **예상 질문 섹션만** 뽑는다 (스코어카드와 가이드는 이 단계에 필요 없다)
   ```bash
   sed -n '/^## 예상 면접 질문/,/^## /p' outcome/{company}/0_evaluate/{company}-evaluate.md
   ```

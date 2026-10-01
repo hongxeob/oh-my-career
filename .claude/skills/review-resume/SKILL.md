@@ -14,31 +14,22 @@ description: Use when resume drafts have been verified and need deep quality rev
 
 **기본 경로** (oh-my-career 프로젝트):
 - 검증 리포트: `outcome/{company}/2_verify/{company}-verify.md`
-- 교차검증 게이트: `head -8 outcome/{company}/2_verify/{company}-cross-verify.md` — **게이트 줄만 읽는다**
-  (지적 목록 전문이 필요한 건 `/refine-resume`이지 리뷰가 아니다. 전문을 읽으면 12KB를 0.4KB 대신 올린다)
+- 초안: `outcome/{company}/1_draft/{company}-draft-{추천버전}.md`
+- 출력: `outcome/{company}/3_review/{company}-review.md`
 
 ### 🚫 시작 전 중단 조건 (2.5단계 게이트)
 
-아래 둘 중 하나면 **리뷰를 시작하지 않고 즉시 중단**한다. 리뷰는 표현과 구조를 보는 단계라,
-수치가 엉뚱한 줄에 붙어 있어도 통과시킨다 — 그래서 이 게이트가 리뷰보다 앞에 있어야 한다.
+리뷰는 표현과 구조를 보는 단계라 수치가 엉뚱한 줄에 붙어 있어도 통과시킨다. 그래서 게이트가 리뷰보다 앞에 있다.
 
+```bash
+bash .claude/skills/_shared/check-gate.sh {company} || exit 1   # 검증 대상 줄과 GATE 줄만 출력한다
 ```
-1) cross-verify 리포트 파일이 없다
-   ❌ outcome/{company}/2_verify/{company}-cross-verify.md 가 없습니다.
-      2.5단계를 건너뛰었습니다. /cross-verify 를 먼저 실행하세요.
 
-2) `^GATE:` 줄이 PASS가 아니다
-   ❌ 교차검증 게이트가 PASS가 아닙니다.
-      검증했던 파일을 직접 고치고 /cross-verify 를 재실행하세요.
-      (`/refine-resume`를 태우지 않는다 — 이 시점엔 3_review 리포트가 없어 refine이 읽을 것이 없다)
-
-3) 리포트의 `검증 대상:` 줄이 이번 리뷰 대상과 다르다
-   ❌ 문서 X에 대한 PASS로 문서 Y를 리뷰할 수 없습니다.
-```
+- 실패하면 중단한다. BLOCK이면 검증했던 파일을 직접 고치고 `/cross-verify`를 재실행하라고 안내한다
+  (`/refine-resume`를 태우지 않는다. 이 시점엔 3_review 리포트가 없어 refine이 읽을 것이 없다)
+- 출력된 `검증 대상:`이 이번 리뷰 대상과 다르면 중단한다. 문서 X의 PASS로 문서 Y를 리뷰할 수 없다
 
 **"이번엔 수치가 단순해서 괜찮다"는 판단으로 넘기지 않는다.** 실제 사고는 전부 그 판단에서 났다.
-- 초안: `outcome/{company}/1_draft/{company}-draft-{추천버전}.md`
-- 출력: `outcome/{company}/3_review/{company}-review.md`
 
 ## Process
 
@@ -47,7 +38,6 @@ description: Use when resume drafts have been verified and need deep quality rev
 한 번에 배치로 읽는다:
 
 ```
-head -8 outcome/{company}/2_verify/{company}-cross-verify.md   ← 게이트 PASS/BLOCK (먼저 확인)
 Read: outcome/{company}/2_verify/{company}-verify.md            ← 추천 버전 확인
 Read: outcome/{company}/1_draft/{company}-draft-{추천버전}.md
 ```
@@ -64,6 +54,8 @@ verify가 **하이브리드를 추천했으면** 베이스 버전과 이식 대�
 | 가장 강한 성과가 앞에 오는가 | ... | ✅/❌ | ... |
 | JD 포지션명과 언어가 일치하는가 | ... | ✅/❌ | ... |
 | 3문장 이내로 읽히는가 | ... | ✅/❌ | ... |
+| 처음 보는 사람 기준을 지켰는가 (`final-check/house-style.md` 「Summary는 처음 보는 사람 기준으로 쓴다」 S1-S8) | ... | ✅/❌ | 위반 번호와 고친 문장 |
+| "어떤 개발자인가"가 읽히는가 (`house-style.md` 「Summary 구성」: 정체성 → 근거 → 일하는 방식 → 회사가 찾는 결). 성과 bullet 축약 나열이면 ❌ | ... | ✅/❌ | 뼈대에 맞춘 고친 문장 |
 
 ### Step 3: 경험 Bullets 리뷰
 
@@ -156,12 +148,5 @@ STAR 밀도:
    **무엇을 반영할지 사람이 정한다.**
 ```
 
-> **이어달리기 규칙 (앞 구간만)** — 파이프라인은 **`/review-resume`까지만** 자동으로 이어진다.
-> `draft → verify → cross-verify → review`는 전부 **리포트만 내는 단계**라 사람이 볼 게 없다.
->
-> **`/refine-resume`부터는 사용자가 직접 호출한다.** refine, final-check, pdf는 제출본 문장을 다시 쓰거나
-> 제출본을 확정하는 단계다. 사고는 전부 이 뒤쪽 구간에서 났다 — 오귀속, 게이트 우회, 게이트에서
-> 떨어진 PDF가 "지원 완료"로 기록된 것 전부.
->
-> 중간에 사용자가 끼어들면 그 지시가 우선한다.
+> 자동 연결은 `/review-resume`까지다. `/refine-resume`부터는 사용자가 호출한다 (CLAUDE.md 「핵심 규칙」). 중간에 사용자가 끼어들면 그 지시가 우선한다.
 
