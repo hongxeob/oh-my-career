@@ -127,7 +127,7 @@ const PIPELINE_DATA = {
   generatedAt: "{YYYY-MM-DD HH:MM}",
   companies: [
     {
-      name: "kakao-style",
+      name: "peachpay",
       stages: {
         evaluate:    { done: true,  content: "...md..." },
         draft:       { done: true,  tabs: { A: "...md...", B: "...md...", C: "...md..." } },
@@ -138,7 +138,7 @@ const PIPELINE_DATA = {
         finalCheck:  { done: false, content: null },
         pdf:         { done: false, content: null }
       },
-      nextCommand: "/refine-resume kakao-style"
+      nextCommand: "/refine-resume peachpay"
     }
   ]
 };
@@ -190,7 +190,7 @@ oh-my-career Dashboard  |  생성: {generatedAt}
 
 **6. 다음 단계 박스 (하단 고정)**
 ```
-다음 단계:  /refine-resume kakao-style   [📋 복사]
+다음 단계:  /refine-resume peachpay   [📋 복사]
 ```
 - 코드 스타일 배경 (`#0d1117`)
 - [📋 복사] 버튼 클릭 → `navigator.clipboard.writeText()` → "✅ 복사됨!" 1.5초 표시

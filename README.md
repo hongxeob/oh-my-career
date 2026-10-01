@@ -22,7 +22,7 @@ src/.my/                          ← 개인정보 영역, 통째로 gitignore
 ```
 
 - 형식이 궁금하면 예시를 보세요: `src/example-my-resume.md`(가상 인물 김개발), `src/example-jd.md`(가상 회사 피치페이)
-- `{company}`는 영문 소문자 (`kakao`, `toss`, `line-plus`)
+- `{company}`는 영문 소문자 (`peachpay`, `line-plus`)
 - 💡 공고 URL 앞에 `r.jina.ai/`를 붙이면 광고 없이 깨끗한 텍스트로 가져옵니다 (`https://r.jina.ai/careers.kakao.com/jobs/12345`)
 
 ### 2. 커맨드 실행
@@ -93,7 +93,7 @@ claude
 
 ```bash
 /dashboard            # 현황 모드: 파일 존재만 확인. 가볍다 (기본)
-/dashboard toss       # 상세 모드: 그 회사 리포트를 브라우저에서 읽기
+/dashboard peachpay   # 상세 모드: 그 회사 리포트를 브라우저에서 읽기
 /dashboard --all      # 전 회사 상세. 토큰을 많이 쓴다
 ```
 

@@ -58,7 +58,7 @@ outcome/interview/whiteboard-3frames.md    (수기 — 생성 스킬 없음)
 outcome/interview/cdc-pipeline-script.md   (수기 — 생성 스킬 없음)
 ```
 
-예: 카카오스타일 → `outcome/kakao-style/1_draft/kakao-style-draft-A.md`, `outcome/kakao-style/2_verify/kakao-style-verify.md` ...
+예: 피치페이 → `outcome/peachpay/1_draft/peachpay-draft-A.md`, `outcome/peachpay/2_verify/peachpay-verify.md` ...
 
 ## 경로 해석 (여기서만 정의한다)
 

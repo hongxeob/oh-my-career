@@ -43,7 +43,7 @@ Read: outcome/{company}/4_refine/{company}-final.md
   ❌ outcome/{company}/4_refine/{company}-final.md 파일이 없습니다.
      먼저 /refine-resume를 실행해 최종본을 생성하세요.
   ```
-- 폴더명/파일명에서 `{company}` 자동 파싱 (예: `outcome/kakao-style/4_refine/kakao-style-final.md` → `kakao-style`)
+- 폴더명/파일명에서 `{company}` 자동 파싱 (예: `outcome/peachpay/4_refine/peachpay-final.md` → `peachpay`)
 - `src/photo.jpg` 존재 여부 확인
 
 **`{company}-final.md`는 제출본 그 자체다 — 첫 줄부터 마지막 줄까지 전부 HTML에 넣는다.**
