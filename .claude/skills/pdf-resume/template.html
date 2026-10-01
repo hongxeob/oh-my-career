@@ -159,13 +159,15 @@ th { background: #f5f5f5; font-weight: 600; text-align: left; }
   </div>
 </section>
 
+<!-- 스킬 섹션은 표가 아니라 목록이다. 최종본(4_refine)이 목록으로 쓰므로 마크업이 원문과 같아지고,
+     표는 행마다 테두리와 상하 패딩이 붙어 같은 내용에 5-6줄을 더 먹는다.
+     표가 필요한 문서를 위해 table CSS는 그대로 남겨둔다. -->
 <section>
-  <h2>기술 스택 (전체)</h2>
-  <table>
-    <tr><th>구분</th><th>기술</th></tr>
+  <h2>스킬</h2>
+  <ul>
     <!-- {{STACK_ROWS}} — JD 필수 기술이 위로 오도록 정렬 -->
-    <tr><td>{{CATEGORY}}</td><td>{{ITEMS}}</td></tr>
-  </table>
+    <li><strong>{{CATEGORY}}</strong>: {{ITEMS}}</li>
+  </ul>
 </section>
 
 <!-- {{EXTRA_SECTIONS}} — 최종본에 개인 프로젝트·교육·수상 등 추가 섹션이 있으면
